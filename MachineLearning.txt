@@ -1,0 +1,12 @@
+*Bütün değişkenleri sisteme almak bir yöntemdir ancak her zaman iyi
+bir yöntem değildir, bazen bu değişkenleri elememiz gerekir.
+Nasıl eleyeceğimiz konusuna gelirsek de farklı yaklaşımlar vardır.Bunlar;
+	- Bütün değişkenleri dahil etmek
+	- Geriye doğru eleme(Backward Elimination)
+	- İleri Seçim (Forward Selection)
+	- İki Yönlü Eleme (bidirectional elimination)
+	- Skor Karşılaştırması (Score Comparison)
+	
+	
+	
+	

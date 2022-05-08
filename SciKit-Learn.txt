@@ -1,0 +1,35 @@
+Metot							Açıklama
+fit(x, y)						Modeli veriyle eğitmek
+transform(X)					Veriyi dönüştürmek ve verimli hale almak
+fit_transform(X)				Önce fit ardından transform uygular
+predict(X)						Modelin tahmin etmesi
+score(X, y)						Tahmin skorunu (ihtimalini) verir
+coef_							Ağırlık katsayılarının (ß_{1...n}ß 1...n) değerlerini verir
+intercept_						Sabit sayı (bias ß_0ß 0) değerini verir
+
+
+DataFrame dilimleme: slicing datas[:,:-1],datas[:,1:2]
+
+Decision Tree(Karar Ağacı): Genellikle sınıflandırma ile ilgili algoritma ama tahmin de yapılıyor, sadece görselleştirme için bile kullanılabilir.
+	Example: Bir kişinin boyuna ve kilosuna bakarak yaşını veya cinsiyetini tahmin etme
+	Çoğunluk erkek diyorsa erkek, çoğunluk kadın diyorsa kadın, bu sınıflandırmadır.
+	Tahmindeki yaklaşım ise ortalamaların alınması
+	
+Training aşamasında veri kümesini birden fazla decision tree çiziyoruz, tahmin(predict) aşamasında ise bu decision tree'leri veriyoruz ve çıkan sonuçların ortalamasını alıyoruz. 
+Decision Tree'lerde verinin artaması durumunda başarı düşebilir çünkü
+ sonuçların yanlış çıkması overfitting'e(aşırı öğrenme,ezberleme) etki
+ edebilir, ikincisi ağacın çok fazla dallanıp budaklanması hesaplanması
+ açısından uzun sürebilir(rassal ağaçlar bu açıdan daha sığ,daha fazla 
+ ağaç üreterek çözüm üretmeye çalışıyorlar,farklı farklı açılardan ele 
+ alıyor)
+ 
+ 
+ 
+statsmodels : birçok farklı istatistiksel modelin tahmini için sınıflar ve işlevler sağlar. 
+pandalar: veri işleme ve analiz için kullanılan kitaplık. 
+NumPy : dizi hesaplama için çekirdek kitaplık. 
+Matplotlib: Statik ve etkileşimli grafikler ve görselleştirmeler oluşturmak için kullanılan kapsamlı bir kitaplık. 
+En Küçük Kareler(OLS): Regresyon sonuçları hakkında kapsamlı bir açıklama veren bir tablo elde etmek için kullanılır.
+
+datas.py => eksik data, numerik data, dataları dataFrame'e dönüştürme,farklı farklı dataFrame'leri alıp tek bir dataframe'de merge-concat etmek, (Öznitelik Ölçekleme) Train ve test datas birbirlerini göre ölçelendirme var
+ 
