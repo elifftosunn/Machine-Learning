@@ -59,6 +59,42 @@ print("Second Result",uploaded.predict(X_test))
 #import pmml
 
 '''
+##################################################################
+PCA : Yüksek boyutlu verilerde maksimum varyansı bulmak ve bilgiyi korurken daha küçük boyutlara indirgemektir.
+PCA analizinin işleyiş sırası şu şekildedir;
+
+-Verilerin Boyutunu Azaltma
+-Tahminleme Yapma
+-Veriyi Görüntüleme
+
+PCA’ın kullanıldığı alanlar sırasıyla;
+
+Gürültü Filtreleme
+Verisetinde Anomaly,Outlier olan verileri PCA ile ortaya çıkarılması.
+Görselleştirme
+Boyut indirgendikten sonra rahatça görselleştirme yapılabilir.
+Öznitelik Çıkarımı
+Veriler üzerinden yeni öznitelik çıkarımı yapılabilir.
+Öznitelik Eleme,Dönüştürme
+Fazla olan özelliklerin çıkarılması.
+
+Örnek vermek gerekirse 100.000 özellikli bir verisetinde çalışıyorsunuz ve PCA kullanma kararı aldınız.PCA ile boyut indirgeyerek 20.000 özelliğe kadar indirgediniz,
+bu noktada PCA size verilerinizin kaybolmama garantisini ne yazikki vermez.
+
+###################################################################
+Linear Discriminant Analysis (LDA): machine learning uygulamaları için preprocessing aşamasında boyut azaltma tekniği olarak kullanılır.
+Amaç, overfittingi önlemek ve aynı zamanda hesaplama maliyetlerini azaltmaktır.
+
+LDA, genel olarak PCA’a benzesede LDA’in çalışma mantığında Sınıflar arasındaki uzaklığı maksimize etmek vardır.PCA’da sınıf kavramı yoktur PCA sadece data pointler 
+arası mesafeyi maksimize etmeye çalışır.
+
+PCA ve LDA Arasındaki Farklar
+PCA gözetimsiz öğrenme algoritmasıdır. LDA gözetimli öğrenme algoritmasıdır.
+PCA data pointler arasındaki mesafeyi maksimize etmeye çalışır.LDA sınıflar arasındaki mesafeyi maksimize etmeye çalışır.
+PCA kümeleme problemlerinde kullanılırken,LDA sınıflandırma problemlerinde kullanılır.
+PCA’da sınıf kavramı yoktur.Verilerdeki özellik kavramını kaldırır.Tüm veriler tek bir tipmiş gibi davranılır.
+
+###################################################################
 # PCA'de amaç verileri birbirinden ayrıştıran en iyi algoritmayı bulmak oluyor.
 from sklearn.decomposition import PCA
 # import PCA
@@ -111,12 +147,3 @@ y_pred_svm_lda = svm_lda.predict(X_test_lda.reshape(-1,1))
 heatmapPloth(confusion_matrix(y_test,y_pred_svm_lda),"SVC-LDA", accuracy_score(y_test, y_pred_svm_lda))
 
 '''
-
-
-
-
-
-
-
-
-
