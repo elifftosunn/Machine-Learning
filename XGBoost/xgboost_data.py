@@ -95,6 +95,7 @@ PCA kümeleme problemlerinde kullanılırken,LDA sınıflandırma problemlerinde
 PCA’da sınıf kavramı yoktur.Verilerdeki özellik kavramını kaldırır.Tüm veriler tek bir tipmiş gibi davranılır.
 
 ###################################################################
+'''
 # application of machine learning algorithm without pca
 log_reg = LogisticRegression(random_state=0)
 log_reg.fit(X_train, y_train)
@@ -160,4 +161,4 @@ xgb_lda = XGBClassifier()
 xgb_lda.fit(X_train_Pca,y_train)
 y_pred_lda = xgb_lda.predict(X_test_lda)
 
-'''
+
