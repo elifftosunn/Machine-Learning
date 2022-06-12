@@ -95,19 +95,19 @@ PCA kümeleme problemlerinde kullanılırken,LDA sınıflandırma problemlerinde
 PCA’da sınıf kavramı yoktur.Verilerdeki özellik kavramını kaldırır.Tüm veriler tek bir tipmiş gibi davranılır.
 
 ###################################################################
+# application of machine learning algorithm without pca
+log_reg = LogisticRegression(random_state=0)
+log_reg.fit(X_train, y_train)
+y_pred_log = log_reg.predict(X_test)
+heatmapPloth(confusion_matrix(y_test,y_pred_log),"Logistic Reg.",accuracy_score(y_test,y_pred_log))
+
+
 # PCA'de amaç verileri birbirinden ayrıştıran en iyi algoritmayı bulmak oluyor.
 from sklearn.decomposition import PCA
 # import PCA
 pca = PCA(n_components=2) # 2 column'a indirgeme
 X_train_Pca = pca.fit_transform(X_train)
 X_test_Pca = pca.transform(X_test)
-    
-    
-# application of machine learning algorithm without pca
-log_reg = LogisticRegression(random_state=0)
-log_reg.fit(X_train, y_train)
-y_pred_log = log_reg.predict(X_test)
-heatmapPloth(confusion_matrix(y_test,y_pred_log),"Logistic Reg.",accuracy_score(y_test,y_pred_log))
 
 # application of machine learning algorithm with pca
 log_reg_pca = LogisticRegression(random_state=0)
@@ -115,6 +115,8 @@ log_reg_pca.fit(X_train_Pca, y_train)
 y_pred_pca = log_reg_pca.predict(X_test_Pca)
 heatmapPloth(confusion_matrix(y_test,y_pred_pca),"LOGISTIC-PCA", accuracy_score(y_test, y_pred_pca))
 
+# LDA, genel olarak PCA’a benzesede LDA’in çalışma mantığında Sınıflar arasındaki uzaklığı maksimize etmek vardır.
+# Bu yüzden y_train'i de eğitim setine ekliyoruz.
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 # import LDA
 lda = LDA(solver="svd",n_components=1)
@@ -145,5 +147,17 @@ svm_lda = SVC(kernel="rbf",random_state=0)
 svm_lda.fit(X_train_lda, y_train)
 y_pred_svm_lda = svm_lda.predict(X_test_lda.reshape(-1,1))
 heatmapPloth(confusion_matrix(y_test,y_pred_svm_lda),"SVC-LDA", accuracy_score(y_test, y_pred_svm_lda))
+
+
+# PCA XGBClassifier
+xgb_pca = XGBClassifier()
+xgb_pca.fit(X_train_Pca,y_train)
+y_pred_pca = xgb_pca.predict(X_test_Pca)
+heatmapPloth(confusion_matrix(y_test,y_pred_pca), "XGB PCA", accuracy_score(y_test, y_pred_pca))
+
+# LDA XGBClassifier
+xgb_lda = XGBClassifier()
+xgb_lda.fit(X_train_Pca,y_train)
+y_pred_lda = xgb_lda.predict(X_test_lda)
 
 '''
