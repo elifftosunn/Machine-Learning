@@ -8,175 +8,254 @@ from helpers.dataPreProcessing import *
 from helpers.machineLearning import *
 
 # sport => Source Port => hedef baglanti noktasini belirtir(wifi)
-# dport => Destination Port => disaridan wifiye gelen port 
+# dport => Destination Port => disaridan wifiye gelen port
 # dst => Destination Support Services
-# src => Source (Kablosuz ag) 
+# src => Source (Kablosuz ag)
 # dst => Destination (hedef)  => disaridan gelen ip, dst_port and protocol(tcp,udp gibii)
 # udp => type of packet, simpler packets with just a destination, data inself and a checksum
 # tcp => type of packet, include extra protocol information
 # flows => herhangi internet baglantisina ihtiyac duymadan yalnizca bluetooth veya P2P Wi-Fi ile uygulamaya giris yaparken diger kullanicilar ile mesajlasabiliyorsunuz
 # mac => wifi'si olmayan bir agda internet erisiminiz varsa wifisini paylasarak bir mac pc'yi kendi gecici yonlendiriciniz olarak kullanabilirsiniz
 
-columns = ["Month","Day","Time","Server","Unnamed","ID","TR_IST_AP","flow_or_url","allow_or_src","SNAT_or_DNAT","mac_or_dst",
-           "mac_or_request","protocol","sport","dport"]
-df = pd.read_csv("datas/turcom-wifi.txt",error_bad_lines=False,
-                 sep = " ",header=None, nrows=10000,names = columns)
+columns = ["Month", "Day", "Time", "Server", "Unnamed", "ID", "TR_IST_AP", "flow_or_url", "allow_or_src", "SNAT_or_DNAT", "mac_or_dst",
+           "mac_or_request", "protocol", "sport", "dport"]
+df = pd.read_csv("datas/turcom-wifi.txt", error_bad_lines=False,
+                 sep=" ", header=None, nrows=10000, names=columns)
 
-df = df.drop("Unnamed",axis=1)
+df = df.drop("Unnamed", axis=1)
 # df.to_csv("datas/processedDatas/processFile.csv")
-def datetime(df,time):
+
+
+def datetime(df, time):
     df[time] = pd.to_datetime(df[time])
     df["Minute"] = df[time].dt.minute
     df["Second"] = df[time].dt.second
-datetime(df, "Time")    
-print(dataUnderstand(df))    
+
+
+datetime(df, "Time")
+print(dataUnderstand(df))
 df_copy = df.copy()
- 
-# FEATURE ENGINEERING   
+
+# FEATURE ENGINEERING
 # - kac tane disaridan dst geliyor ve kac saniyede geliyor
-def separatingColon(df,col,split,sep1,sep2):
-    firstValues, secondValues = [],[]
-    firstCount, secondCount = 0,0
+
+
+def separatingColon(df, col, split, sep1, sep2):
+    firstValues, secondValues = [], []
+    firstCount, secondCount = 0, 0
     for col in df[col].values:
         col = str(col)
         values = col.split(split)
         if values[0] == sep1:
-            firstValues.append(values[1])
-            firstCount += 1
+            if values[1] == None:
+                values[1] = 1
+                firstValues.append(values[1])
+                firstCount += 1
+            else:
+                firstValues.append(values[1])
+                firstCount += 1
         if values[0] == sep2:
-            secondValues.append(values[1])
-            secondCount += 1
-    return firstCount,secondCount,firstValues,secondValues
+            if values[1] == None:
+                values[1] = 1
+                secondValues.append(values[1])
+                secondCount += 1
+            else:
+                secondValues.append(values[1])
+                secondCount += 1
+    return firstCount, secondCount, firstValues, secondValues
 
-dstCount,macCount,dstValues,macValues = separatingColon(df, "mac_or_dst", "=", "dst", "mac")
-print("dst count: ",dstCount,"\nmac count: ",macCount)       
+
+dstCount, macCount, dstValues, macValues = separatingColon(
+    df, "mac_or_dst", "=", "dst", "mac")
+print("dst count: ", dstCount, "\nmac count: ", macCount)
 print(df["mac_or_dst"].describe())
-dstDf = pd.DataFrame(data=dstValues,columns=["DST"])
-macDf = pd.DataFrame(data=macValues, columns = ["MAC"])
-df = pd.concat([df,dstDf,macDf],axis=1)
-df["DST"] = df["DST"].fillna(0)
+dstDf = pd.DataFrame(data=dstValues, columns=["DST_MAC"])
+macDf = pd.DataFrame(data=macValues, columns=["MAC"])
+df = pd.concat([df, dstDf, macDf], axis=1)
+df["DST_MAC"] = df["DST_MAC"].fillna(0)
 df["MAC"] = df["MAC"].fillna(0)
-print(df["DST"].describe())
+print(df["DST_MAC"].describe())
 print(df["MAC"].describe())
 # Categoric Columns Visualisation
-dataUnderstand(df).categoricVisualisationBarplot("MAC","Second")
+dataUnderstand(df).categoricVisualisationBarplot("MAC", "Second")
 dataUnderstand(df).categoricVisualisationCountplot("MAC")
-dataUnderstand(df).categoricVisualisationBoxplot("MAC","Second") # outlier values convert to number
+dataUnderstand(df).categoricVisualisationBoxplot(
+    "MAC", "Second")  # outlier values convert to number
 # dataUnderstand(df).categoricVisualisationBoxplot("DST","Second") # outlier values convert to number(nunique value very much)
-
-df.to_csv("datas/processedDatas/data.csv")
-# - hangi protocol ile geliyor ve protocolun gelme sureleri nedir(tcp-udp ayrı ayrı)
-print(df.protocol.value_counts())
-print(df.protocol.values)
-# udpSecondTotal, tcpSecondTotal = 0,0
-# for col in df.columns:
-#     if col == "protocol":          
-#         for value in df[col].values:      
-#             if value == "protocol=udp":
-#                 print(df["Minute"].unique())
-#                     #udpSecondTotal += s
-# print("udpSecondTotal: ",udpSecondTotal)
-#                 #udpSecondTotal += df["Second"].values
-#                 #print(df.iloc[value,"Second"])
-#             # if value == "protocol=tcp":
-#             #     tcpSecondTotal += df["Second"].values
-# #          self.df.loc[(self.df[feature] > a) & (self.df[feature] <= b), feature] = 0
+# df.to_csv("datas/processedDatas/data.csv")
 
 
-# print(df.columns)
-# totalValues = [] 
-# values = {}
-# count,minute, second = 0, 2, 26 
-# for i in range(len(df)): # her satırda dolas 
-#     for j in range(len(df.columns)): # her sutunda dolas
-#         if df.iloc[i,j] == "protocol=udp":
-#             for arr in df.loc[i,["Minute","Second"]]: # 0.row Minute,Second columns, 1.row ....., 2.row
-#                 arr = np.array(df.loc[i,["Minute","Second"]], dtype=np.int64) # 0.row minute, 1.row minute
-#                 a,b = arr             
-#                 if a == minute and b == second: # 1.row == 2.minute, 2.row == 2.minute, 3.row 2.minute
-#                     print(df.loc[i,["Minute","Second","protocol"]])
-#                     count += 1
-#                     minute += 1
-#                     second += 1
-# values["count"] = count
-# totalValues.append(values)
-# print("totalValues: ",totalValues)            
-
-
+# QUESTION 1- hangi protocol ile geliyor ve protocolun gelme sureleri nedir(tcp-udp ayrı ayrı)
+src_Count, dst_src_Count, srcValues, dst_src_values = separatingColon(
+    df, "SNAT_or_DNAT", "=", "src", "dst")
+print("SRC Count: ", src_Count, "\nDST Count: ", dst_src_Count)
+dst_src_Df = pd.DataFrame(data=dst_src_values, columns=["DST_SRC"])
+src_Df = pd.DataFrame(data=srcValues, columns=["SRC"])
+df = pd.concat([df, dst_src_Df, src_Df], axis=1)
+# df["DST_SRC"] = df["DST_SRC"].fillna(0)
+# df["SRC"] = df["SRC"].fillna(0)
+print(df["DST_SRC"].describe(), "\n", df["SRC"].describe())
 '''
-
-Second                26
-protocol    protocol=udp
-Name: 0, dtype: object
-Values:  {'Minute': 2, 'Second': 26, 'Count': 1}
-Minute                 2
-Second                26
-protocol    protocol=udp
-Name: 1, dtype: object
-Values:  {'Minute': 2, 'Second': 26, 'Count': 1}
-Minute                 2
-Second                26
-protocol    protocol=udp
-Name: 1, dtype: object
-Values:  {'Minute': 2, 'Second': 26, 'Count': 1}
-Minute                 2
-Second                26
-protocol    protocol=udp
-Name: 2, dtype: object
-Values:  {'Minute': 2, 'Second': 26, 'Count': 1}
-Minute                 2
-Second                26
-protocol    protocol=udp
-Name: 2, dtype: object
-
-Month                                         Jun
-Day                                            27
-Time                          2022-06-29 00:43:00
-Server            server-176.53.2.142.as42926.net
-ID                           1656279780.353035768
-TR_IST_AP                             TR_IST_AP_4
-flow_or_url                                 flows
-allow_or_src                                allow
-SNAT_or_DNAT                     src=172.19.0.173
-mac_or_dst                      dst=172.18.14.225
-mac_or_request              mac=F4:46:37:8A:F5:A7
-protocol                             protocol=udp
-sport                                 sport=53535
-dport                                    dport=53
-Minute                                         43
-Second                                          0
-DST                                             0
-MAC                                             0
-Name: 9996, dtype: object
-
+- Buradan cikarilan sonuclara gore SOURCE NAT(SNAT) 10000 data'da 172.19.0.173 id'li ic agda bulanan pc
+950 kez dıs agdaki pc net baglantisina erismis
+- DESTINATION NAT(DNAT) 146.112.255.155:443 ip'li dis agda bulunan pc 332 kez ic agdaki ana pc netine erismis
 '''
-    #print(df.iloc[2,0]) # row,column
-#print(df.loc[["protocol","Minute"]])
- # self.df.loc[(self.df[feature] > a) & (self.df[feature] <= b), feature] = 0
-
-    #print(df.loc[i,"protocol"])
-# for i in df:
-#     print(df.loc[i,"protocol"].values)     
-# print("UDP Second Total: ",udpSecondTotal,"\nTCP Second Total: ",tcpSecondTotal)
+df["DST_SRC"] = df["DST_SRC"].fillna(0)
+df["SRC"] = df["SRC"].fillna(0)
+dataUnderstand(df).categoricVisualisationBarplot("SRC", "Second")
+dataUnderstand(df).categoricVisualisationCountplot("SRC")
+dataUnderstand(df).categoricVisualisationBoxplot("SRC", "Second")
 
 
+mac_request_count, request_count, mac_requestValue, requestValue = separatingColon(
+    df, "mac_or_request", "=", "mac", "request")
+print("MAC Count: ", mac_request_count, "\nRequest Count: ", request_count)
+mac_requestDf = pd.DataFrame(data=mac_requestValue, columns=["MAC_Req"])
+df = pd.concat([df, mac_requestDf], axis=1)
+print(df["MAC_Req"].describe())
+df["MAC_Req"] = df["MAC_Req"].fillna(0)
+dataUnderstand(df).categoricVisualisationBarplot("MAC_Req", "Second")
+dataUnderstand(df).categoricVisualisationCountplot("MAC_Req")
+dataUnderstand(df).categoricVisualisationBoxplot("MAC_Req", "Second")
+'''
+Buradan cikarilan sonuclara gore 10000 data'da en fazla 950 kez F4:46:37:8A:F5:A7 id'li pc
+MAC Pc'yi gecici yonlendirici olarak kullanmistir. Bu sekilde wifi'ye erismistir.
+'''
+sportCount, httpsCount, sportValue, httpValue = separatingColon(
+    df, "sport", "=", "sport", "https")
+print("Sport Count: ", sportCount, "\nHttp Count: ", httpsCount)
+sportDf = pd.DataFrame(data=sportValue, columns=["SPORT"])
+df = pd.concat([df, sportDf], axis=1)
+print(df["SPORT"].describe())
+'''
+UDP paketinin hizmet adını, bağlantı noktası numarasını veya bağlantı noktası numarası aralığını kullanarak
+hedef bağlantı noktasını belirtir.
+En fazla hedef baglanti noktasini belirten port with 21 freq 5353 portudur.
+'''
+df["SPORT"] = df["SPORT"].fillna(0)
+df["SPORT"] = df["SPORT"].astype("int32")
+# There are outlier values
+print(dataUnderstand(df).catchOutliers("SPORT", plot=True))
+# Outlier values were discarded
+dataPreProcess(df).crush_outliers("SPORT", q1=0.25, q3=0.75)
+# Data after outliers discarded
+print(dataUnderstand(df).catchOutliers("SPORT", plot=True))
+sns.lineplot(data=df, x="Second", y="SPORT", hue="flow_or_url")
+plt.legend(loc="lower right", shadow=True)
+plt.show()
+
+
+dportCount, noneCount, dportValues, noneValues = separatingColon(
+    df, "dport", "=", "dport", None)
+print("Dport Count: ", dportCount, "\nNone Count: ", noneCount)
+dportDf = pd.DataFrame(data=dportValues, columns=["DPORT"])
+df = pd.concat([df, dportDf], axis=1)
+print(df["DPORT"].describe())
+'''
+UDP paketinin kaynak portunu, servis adını, port numarasını veya port numarası aralığını kullanarak belirtir.	
+Veri gonderimindeki en fazla kullanılan kaynak port:53, 10000 datada 4472 frekans ile(nunique:25,count:7776)
+Geriye kalan 2224 tanesi modemin portu herhangi bir yere yonlenmis oldugundan pasif olarak gelmistir.
+'''
+df["DPORT"] = df["DPORT"].fillna(0)
+df["DPORT"] = df["DPORT"].astype("int32")
+print(dataUnderstand(df).catchOutliers("DPORT", plot=True))
+# Outlier values were discarded
+dataPreProcess(df).crush_outliers("DPORT", q1=0.25, q3=0.75)
+print(dataUnderstand(df).catchOutliers("DPORT", plot=True))
 
 
 
-# df["UDP"] = df["UDP"].fillna(0)
-# df["TCP"] = df["TCP"].fillna(0)
-# dataUnderstand(df).categoricVisualisationBarplot("TCP","Second")
-# dataUnderstand(df).categoricVisualisationCountplot("TCP")
-# dataUnderstand(df).categoricVisualisationBoxplot("TCP","Second")
-# sns.set_theme(style="dark")
-# g = sns.regplot(data=df,x="Second",y="")
+
+
+
+# # QUESTION 2: flows(net baglantisiz) and url(net baglantili) saniyede kac tane geliyor ve hangisi daha hizli
+# flowTimeDf = df.loc[(df["flow_or_url"] == "flows"), [
+#     "flow_or_url", "Second", "Minute"]]
+# urlTimeDf = df.loc[(df["flow_or_url"] == "urls"), [
+#     "flow_or_url", "Second", "Minute"]]
+# flowDf = df.query('flow_or_url == "flows" and Minute == 2 and Second == 26')
+
+# # print(df["Second"].describe(),"\n\n",df["Minute"].describe())
+# def fastestCols(df):
+#    values = []
+#    max = 0
+#    for i in range(60):
+#        for j in range(43):
+#             queryDf = df.query(f'flow_or_url == "flows" and Second == {i} and Minute == {j}')
+#             values.append(queryDf)
+#    for dataFrame in values:
+#        if len(dataFrame) > max:
+#            max = len(dataFrame)
+#    for dataFrame in values:
+#         if len(dataFrame) == max:
+#             fastestFlowDf = dataFrame
+#    return values,max,fastestFlowDf
+
+# values,max,fastestFlowDf = fastestCols(df)
+# print("MAX DataFrame Length as Flows: ",max) # 42
+# '''
+# 34th minute 50th second'de fastest internet baglantisi kullanilmadan Bluetooth veya 
+# P2P Wi-Fi ile uygulamaya giris yapilmis
+# '''
+# def urlsCols(df):
+#    valuesUrls = []
+#    max = 0
+#    for i in range(60):
+#        for j in range(43):
+#             queryDf = df.query(f'flow_or_url == "urls" and Second == {i} and Minute == {j}')
+#             valuesUrls.append(queryDf)
+#    for dataFrame in valuesUrls:
+#        if len(dataFrame) > max:
+#            max = len(dataFrame)
+#    for dataFrame in valuesUrls:
+#         if len(dataFrame) == max:
+#             fastestUrlDf = dataFrame
+#    return valuesUrls,max,fastestUrlDf
+# valuesUrls,max,fastestUrlDf = urlsCols(df)
+# print("MAX DataFrame Length as Urls: ",max) # 14
+# '''
+# 39th minute 50th second fastest net baglantisi kullanılarak uygulamaya giris yapilmis
+# '''
 
 
 
 
+
+
+
+
+
+
+# QUESTION 3: KABLOSUZ AGDAN HEDEFE KAC SANIYEDE GIDILIYOR YA DA SANIYEDE KAC KEZ GIDILEBILIYOR?
+# SOURCE'DAN HEDEFE ARADA KAC SANIYE GECTIGINI BUL
+
+
+def source(df,value):
+    valueSources = []
+    max = 0
+    for i in range(60):
+        for j in range(43):
+            query = df.query(f'SRC == value and Second == {i} and Minute == {j}')
+            valueSources.append(query)
+    for dframe in valueSources:
+        if len(dframe) > max:
+            max = len(dframe)
+    for dframe in valueSources:
+        if len(dframe) == max:
+            fastestDf = dframe 
+    return valueSources, max, fastestDf
+valueSourcesDFrames, maxValues, fastestDFrames = [],[],[]
+for value in df["SRC"].unique():
+    val = '"'+str(value)+'"'
+    valueSources, max, fastestDf = source(df,val)
+    valueSourcesDFrames.append(valueSources)
+    maxValues.append(max)
+    fastestDFrames.append(fastestDf)
+
+# DATA PREPARATION
 # datetime(df, "Time")
 # df = df.drop("Time",axis=1)
-    
+
 # for col in df.columns:
 #     print(col,":\n",df[col].value_counts())
 
@@ -188,7 +267,6 @@ Name: 9996, dtype: object
 # dataUnderstand(df).numericVisulisation(numeric_cols)
 
 
-
 # for col in df.columns:
 #     print(dataUnderstand(df).col_Corr(col))
 # '''
@@ -197,10 +275,9 @@ Name: 9996, dtype: object
 # Maximum TR_IST_AP_4
 # Maximum protocol=udp yani veri gonderir ve alır, hızlıdır ama veri gonderimini garanti etmez
 # Maximum sport: https://api.opendns.com/... yani source port
-# Maximum dport: 53 yani hedef(destination) port 
+# Maximum dport: 53 yani hedef(destination) port
 
 # '''
-
 
 
 # # Categoric Columns Visualisation
@@ -215,7 +292,7 @@ Name: 9996, dtype: object
 # # Missing Value Control and Fillna
 # NaN_Columns,missingDf = dataUnderstand(df).missingValueTables()
 # print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
-# # NaN_Columns:  ['protocol', 'sport', 'dport'] 
+# # NaN_Columns:  ['protocol', 'sport', 'dport']
 # for col in NaN_Columns:
 #     missingValue(df).categoric_Freq(col)
 # NaN_Columns,missingDf = dataUnderstand(df).missingValueTables()
@@ -250,11 +327,11 @@ Name: 9996, dtype: object
 #         col = re.sub("-","_",col)
 #         array.append(col)
 #     return array
-# df.columns = columnsToString(df, columns)    
+# df.columns = columnsToString(df, columns)
 # print(df.columns)
 # # for col in df.columns:
 # #     print(dataUnderstand(df).col_Corr(col))
-    
+
 # # dport => There are Outlier Value
 # df = df.drop(["]","UNKNOWN","(",],axis=1)
 # #print(dataUnderstand(df).num_summary("dport",plot=True)) # before
@@ -321,7 +398,6 @@ Name: 9996, dtype: object
 
 # sns.jointplot(data=df, x="Second",y="mac_or_dst",color=("purple"))
 # plt.show()
-
 
 
 
