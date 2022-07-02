@@ -6,6 +6,7 @@ try:
     import pymongo
     from pymongo import MongoClient
     from bson.objectid import ObjectId
+    import datetime
     print("All modules loaded")
 except Exception as e:
     print(f'Error : {e}')
@@ -52,13 +53,24 @@ class MongoInformation(object):
             return self.client.mclient[DbName].list_collection_names()
     def dataFindAll(self):
         return self.client.mclient[self.databaseName][self.collectionName].find({})
-    def dataFindQuery(self,query):
+    def dataFindQuery(self,query,columns = None):
         try:
-            return self.client.mclient[self.databaseName][self.collectionName].find(query)
+            return self.client.mclient[self.databaseName][self.collectionName].find(query,columns)
         except Exception as e:
             return e
     def dataFindHead(self,limit):
         return self.client.mclient[self.databaseName][self.collectionName].find().limit(limit)
+    def dataFindOne(self,query):
+        try:
+            return self.client.mclient[self.databaseName][self.collectionName].find_one(query)
+        except Exception as e:
+            return e
+    def countData(self,query):
+        result = self.client.mclient[self.databaseName][self.collectionName].count_documents(query)
+        if result > 0:
+            return result
+        else:
+            return "Not query!"
    
 class MongoInsert(object):
     def __init__(self, _client = None, _mongoInformation = None):
@@ -128,7 +140,7 @@ class MongoResult(object):
         self._collectionName = collectionName
         self._mongoInformation = MongoInformation(self._client, self._databaseName, self._collectionName)
         self._insert = MongoInsert(_client = self._client,  _mongoInformation = self._mongoInformation)
-        #self._update = MongoUpdate(_mongoInsert = self._insert, _query, _newValues)
+        #self._update = MongoUpdate(_mongoInsert = self._insert,_query= _query,_newValues = _newValues)
         self._delete = MongoDelete(self._client,self._mongoInformation)
     def insert_one(self, record):
         return self._insert.insert_One(record)
@@ -142,17 +154,127 @@ def main():
     mongoResult =  MongoResult(host="localhost",
                                port=27017,
                                maxPoolSize=50,
-                               databaseName="denemeDtaBase",
-                               collectionName=("denemeCollection"))
-    record = {"name":"Elif","age":20}
-    mongoResult.insert_one(record)
-    print(mongoResult._mongoInformation.databaseNames())
-    print(mongoResult._mongoInformation.collectionNames("denemeDatabase"))
-    print(mongoResult) 
+                               databaseName="wifiData",
+                               collectionName=("wifiCollection"))
 
-if __name__ == "__main__":
+    #print(mongoResult._mongoInformation.databaseNames())
+    #print(mongoResult._mongoInformation.collectionNames("wifiData"))
+    # for value in mongoResult._mongoInformation.dataFindAll():
+    #     print(value)
+    
+    # for value in mongoResult._mongoInformation.dataFindQuery({"Server":"server-176.53.2.142.as42926.net"}):
+    #     print(value)
+    # print(mongoResult._mongoInformation.dataFindOne({"Server":"server-176.53.2.142.as42926.net"}))
+    #print(mongoResult._mongoInformation.dataFindOne({"_id":ObjectId("62be8c87b56e0328f9229a48")}))
+    # print(mongoResult._mongoInformation.countData({"Server":"server-176.53.2.142.as42926.net"}))
+    # print(mongoResult._mongoInformation.countData({"flow_or_url":"flows"}))
+    # for flow in mongoResult._mongoInformation.dataFindAll():
+    #     print(flow,"\n")
+    
+    import dateutil
+    # print(mongoResult._mongoInformation.countData({"protocol":"protocol=tcp"})) # 2441
+    # # dst ile başlayanları al =>  $regex":"^dst
+    # query = {"SNAT_or_DNAT":{"$regex":"^dst"}}
+    # result = mongoResult._mongoInformation.dataFindQuery(query)
+    # count = mongoResult._mongoInformation.countData(query)
+    # for value in result[0:5]:
+    #     print(value,"\n")
+    # print("Count: ",count)
+    
+    # query2 = {"Date":{"$dayOfMonth":"2022-06-26T21:02:30.000+00:00"}}
+    # result2 = mongoResult._mongoInformation.dataFindQuery(query2)
+    # print(mongoResult._mongoInformation.countData(query2))
+    # for value in result2:
+    #     print(value,"\n")
+    
+    
+    # SORGUYA GORE BELIRLI KOLONLARI CEKME
+    columns = {"_id":0,"flow_or_url":1,"allow_or_src":2,"protocol":3,"Date":4}
+    result3 = mongoResult._mongoInformation.dataFindQuery({
+                                                        "flow_or_url":"flows"
+                                                        },columns)
+        
+    def dateHourMinuteSecond():
+        for value in mongoResult._mongoInformation.dataFindHead(5):
+            # print(value["Date"])
+            # print(type(value["Date"]))
+            print(value["Date"].hour," ",value["Date"].minute," ",value["Date"].second)
+    #dateHourMinuteSecond()
+   
+    
+    class Question(object): # CLASS'A DONUSTURRRRRRRRRRRRRRRRRRRRRRRRR
+        pass
+    def SecondOrMinute(columns,query,second,minute):
+        FeatureResult = mongoResult._mongoInformation.dataFindQuery(query,columns)    
+        countSecond, countMinute = 0, 0
+        for value in FeatureResult:
+            result = value["Date"].second == second
+            if result == True:
+                countSecond +=1
+        FeatureResult = mongoResult._mongoInformation.dataFindQuery(query,columns)    
+        for value in FeatureResult:
+            result = value["Date"].minute == minute
+            if result == True:
+                countMinute += 1
+        return countSecond, countMinute
+    # kac tane disaridan dst geliyor? kac saniyede geliyor ve en cok kacıncı saniyede geliyor?
+    def dstResult():
+        columns = {"_id":0,"mac_or_dst":1,"Date":2,"protocol":3}
+        queryDst = {"mac_or_dst":{"$regex":"^dst"}}
+        countResultDstSecond, countResultDstMinute = {}, {}
+        for i in range(60):
+            countSecond, countMinute = SecondOrMinute(columns,queryDst,i,i)
+            countResultDstSecond[i] = countSecond
+            countResultDstMinute[i] = countMinute
+        # for key,value in countResultMinute.items():
+        #     print(key,":",value)
+        # for key,value in countResultSecond.items():
+        #     print(key,":",value) 
+        return countResultDstMinute,countResultDstSecond
+    
+    # HANGI PROTOCOL ILE GELIYOR VE PROTOCOL'UN GELME SURELERI NEDIR?
+    df = pd.read_csv("datas\processedDatas\mongo-wifi.csv")
+    #print(df["protocol"].value_counts())
+    def protocolUdp():
+        queryProtocolUdp = {"protocol":"protocol=udp"}
+        columns = {"_id":0,"protocol":1,"Date":2}
+        countResultUdpSecond, countResultUdpMinute = {}, {}
+        for i in range(60):
+            countSecond, countMinute = SecondOrMinute(columns,queryProtocolUdp,i,i)
+            countResultUdpSecond[i] = countSecond 
+            countResultUdpMinute[i] = countMinute 
+        return countResultUdpMinute,countResultUdpSecond
+    #protocolUdp()
+    def protocolTcp():
+        queryProtocolTcp = {"protocol":"protocol=tcp"}
+        columns = {"_id":0,"protocol":1,"Date":2}
+        countResultTcpSecond, countResultTcpMinute = {}, {}
+        for i in range(60):
+            countSecond, countMinute = SecondOrMinute(columns,queryProtocolTcp,i,i)
+            countResultTcpSecond[i] = countSecond 
+            countResultTcpMinute[i] = countMinute 
+        return countResultTcpMinute,countResultTcpSecond
+    #protocolTcp()
+    def Results(*results):
+        max_value_minute,max_key_minute = int(),int()
+        for key,value in results[0].items():
+            if value > max_value_minute:
+                max_value_minute = value
+                max_key_minute = key
+        max_value_second,max_key_second = int(),int()
+        for key,value in results[1].items():
+            if value > max_value_second:
+                max_value_second = value
+                max_key_second = key        
+        print("Max Value Minute: ",max_key_minute)
+        print("Max Value Second: ",max_key_second)  
+    countResultMinute,countResultSecond = dstResult() # Max Value Minute: 19, Max Value Second: 50
+    countResultUdpMinute,countResultUdpSecond = protocolUdp() # Max Value Minute: 19, Max Value Minute: 50
+    countResultTcpMinute,countResultTcpSecond = protocolTcp() # Max Value Minute: 19, Max Value Second: 56
+    Results(countResultTcpMinute,countResultTcpSecond)
+    
+    
+    
+if __name__ == "__main__":  
     main()
     
-    
-
-        
