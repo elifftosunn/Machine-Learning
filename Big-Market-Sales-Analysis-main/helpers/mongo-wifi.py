@@ -1,6 +1,5 @@
 from helpers.mongo import *
 
-
 #print(mongoResult._mongoInformation.databaseNames())
 #print(mongoResult._mongoInformation.collectionNames("wifiData"))
 # for value in mongoResult._mongoInformation.dataFindAll():
@@ -31,14 +30,8 @@ import dateutil
 # for value in result2:
 #     print(value,"\n")
 
-
-# SORGUYA GORE BELIRLI KOLONLARI CEKME
-columns = {"_id":0,"flow_or_url":1,"allow_or_src":2,"protocol":3,"Date":4}
-result3 = mongoResult._mongoInformation.dataFindQuery({
-                                                    "flow_or_url":"flows"
-                                                    },columns)
-       
-
+C:\Users\dptos\OneDrive\Masaüstü\Python\project-wifii
+C:\Users\dptos\OneDrive\Masaüstü\Python\MachineLearning
 
 def SecondOrMinute(columns,query,second,minute):
     FeatureResult = mongoResult._mongoInformation.dataFindQuery(query,columns)    
@@ -73,7 +66,6 @@ def numberServer(columns,queryServer,server):
         if result == True:
             countServer += 1
     return countServer
-# HANGI SERVER'LAR DAHA HIZLI VE HANGI SERVER'DAN KAC ADET DST GELIYOR?
 def NumberOfServerResult(): 
     queryServerDst =  {"mac_or_dst":{"$regex":"^dst="}}
     columns = {"_id":0,"mac_or_dst":1,"Server":2,"Date":3}
@@ -188,7 +180,7 @@ server-176.53.2.142.as42926.net             9011
 195.175.205.46.static.turktelekom.com.tr     978
 merakimulti                                   11
 '''
-#print(df["protocol"].value_counts())
+print(df["SNAT_or_DNAT"].value_counts())
 def protocolUdp():
     queryProtocolUdp = {"protocol":"protocol=udp"}
     columns = {"_id":0,"protocol":1,"Date":2}
@@ -201,7 +193,7 @@ def protocolUdp():
     #     print("Protocol Udp Minute",key,":",value) # Max Value Minute: 19 : 316
     # for key,value in countResultDstSecond.items():
     #     print("Protocol Udp Second",key,":",value) # Max Value Second: 50 : 219
-    return countResultUdpMinute,countResultUdpSecond
+    return countResultUdpMinute,countResultUdpSecondSS
 #protocolUdp()
 def protocolTcp():
     queryProtocolTcp = {"protocol":"protocol=tcp"}
@@ -305,20 +297,12 @@ countResultTcpMinute,countResultTcpSecond = protocolTcp() # Max Value Minute: 19
 countResultFlowsMinute,countResultFlowsSecond = flows() # Flows Minute  19 : 316, Flows Second  50 : 219
 countResultUrlMinute, countResultUrlSecond = urls() # Url Minute 22 : 117, Url Second 50 : 81
 countResultDportMinute, countResultDportSecond = dport() # Dport Minute 19 : 315, Dport Second 50 : 214
-'''
-# Max Value Dst:  dst=172.18.14.96 => 2439
-server-176.53.2.142.as42926.net Max Value Server: 7184
-19 Max Value Minute: 316
-50 Max Value Second: 219
-'''
+
 #countResultServerDstMinute,countResultServerDstSecond, eachDstNumber, serverNumber = NumberOfServerResult()
 countResultMacMinute,countResultMacSecond, macNum = macOrRequestResult() # SUNAAAA TEKRAR BAKKKKKKKKKK
-'''
-19 Max Value Minute: 316
-50 Max Value Second: 219
-mac=F4:46:37:8A:F5:A7 Max Value Dst: 950
-'''
 #Results(countResultMacMinute,countResultMacSecond, macNum) 
+
+
 '''
 - kac tane disaridan dst geliyor ve kac saniyede geliyor
 - hangi protocol ile geliyor ve protocolun gelme sureleri nedir(tcp-udp ayrı ayrı)
@@ -336,6 +320,12 @@ mac=F4:46:37:8A:F5:A7 Max Value Dst: 950
      dst=146.112.48.82           1
      Name: mac_or_dst, Length: 530, dtype: int64
      
+     # Max Value Dst:  dst=172.18.14.96 => 2439
+     server-176.53.2.142.as42926.net Max Value Server: 7184
+     19 Max Value Minute: 316
+     50 Max Value Second: 219
+     
+     
     Max Value Minute:  19
     Max Value Second:  50
     Max Value Dst:  dst=172.18.14.96 => 2439
@@ -349,8 +339,34 @@ mac=F4:46:37:8A:F5:A7 Max Value Dst: 950
     Bu sonuclara gore packet type olarak basic udp protocol'u kullanilmis ve sadece data
     gonderip almak icin kullanılan bir packet turudur. Advantage olarak hızlıdır but bir oturum
     olusturmadigi and data teslimini guarantee etmedigi anlamina gelir.
+    - 10000 data uzerinde en fazla 2439 freq Destination Port
+    - 10000 data uzerinde en cok 7184 freq server-176.53.2.142.as42926.net  Server
+    - 10000 data uzerinde en cok wifi kullanimi 19th minute 50th second gerceklesmistir.
+    - 10000 data uzerinde en cok 7876 freq flows(net baglantisiz:Bluetooth or P2P_Wi-Fi)  
+    - 10000 data uzerinde en cok 5335 freq udp packet type kullanilmistir. Yani veri gonderir ama teslimini garanti etmez.(baglantisiz)
+    - 10000 data uzerinde en cok 4472 freq dport=53 => udp paketinin source port
+    
 
 '''
+
+'''
+ Flows Minute  19 : 316, Flows Second  50 : 219
+ Bu sonuclara gore 19th minute 316 freq, 50th second 219 freq ile net baglantisina ihtiyac duyulmadan
+ yalnizce Bluetooth ya da P2P Wi-Fi ile uygulamaya giris yapilmis
+
+'''
+'''
+Max Value Minute Tcp => 19 : 316, Max Value Second Tcp => 56 : 174
+Max Value Minute Udp =>  19 : 316, Max Value Minute Udp =>  50 : 219
+Bu sonuclara gore 
+
+
+'''
+
+
+
+
+
 
 '''
 
