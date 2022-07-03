@@ -30,8 +30,6 @@ import dateutil
 # for value in result2:
 #     print(value,"\n")
 
-C:\Users\dptos\OneDrive\Masaüstü\Python\project-wifii
-C:\Users\dptos\OneDrive\Masaüstü\Python\MachineLearning
 
 def SecondOrMinute(columns,query,second,minute):
     FeatureResult = mongoResult._mongoInformation.dataFindQuery(query,columns)    
