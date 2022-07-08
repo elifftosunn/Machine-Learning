@@ -65,7 +65,8 @@ class dataUnderstand(object):
          NaN_Columns = [col for col in self.df.columns if self.df[col].isnull().sum() > 0]
          missingValues = self.df[NaN_Columns].isnull().sum()
          ratio = missingValues/len(self.df)
-         missingDf = pd.concat([missingValues,ratio],axis=1, keys=["missingValues","ratio"])
+         typeCol = self.df[NaN_Columns].dtypes
+         missingDf = pd.concat([missingValues,ratio,typeCol], keys=["missingValues","ratio","Col_Type"], axis=1)
          return NaN_Columns,missingDf
      
      def checkOutlier(self, col, q1 = 0.25, q3 = 0.75):
@@ -83,9 +84,9 @@ class dataUnderstand(object):
          lower, upper = dataPreProcess(self.df).outlierThreshold(col,q1,q3)
          valuesDf = self.df[(self.df[col] < lower) | (self.df[col] > upper)]
          if valuesDf.shape[0] > 10:
-             return str(valuesDf.head()) + "\n\n" + str(valuesDf.index)
+             return str(col) + "\n" + str(valuesDf.head()) + "\n\n" + str(valuesDf.index)
          else:
-             return str(valuesDf) + "\n\n" + str(valuesDf.index)
+             return str(col) + "\n" + str(valuesDf) + "\n\n" + str(valuesDf.index)
      def categoricVisualisationBarplot(self,categoric_cols,target):
          number_of_colors = len(categoric_cols)
          color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
@@ -180,7 +181,6 @@ class dataUnderstand(object):
          self.df.loc[(self.df[feature] > e) & (self.df[feature] <= f), feature] = 4
          self.df.loc[(self.df[feature] > f) & (self.df[feature] <= g), feature] = 5
          self.df.loc[(self.df[feature] > g) & (self.df[feature] <= h), feature] = 6
-    
     
 class missingValue(object): # Machine Learning Algorithm da kullabılabilir.
     def __init__(self,df):

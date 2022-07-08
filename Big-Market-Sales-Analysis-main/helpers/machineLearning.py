@@ -28,6 +28,8 @@ class MachineLearning:
         X = self.df.drop(target,axis=1)
         y = self.df[target]
         X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size,random_state=random_state)
+        # if len(np.sum(y_train)) in [len(y_train),0]:
+        #     print("all one class")
         return X_train,X_test,y_train, y_test   
     def standardScaler(self,train, test):
         scaler = StandardScaler()
@@ -82,7 +84,7 @@ class MachineLearning:
                       ('GBM', GradientBoostingRegressor()),
                       ('XGBoost', XGBRegressor(
                           use_label_encoder=False)),
-                      ('LightGBM', LGBMRegressor())
+                      ('LightGBM', LGBMRegressor())#[LightGBM] [Fatal] Do not support special JSON characters in feature name.
                       ]
         X_train, X_test, y_train, y_test = self.get_dataset(target, test_size, random_state)
         for name,model in regressors:

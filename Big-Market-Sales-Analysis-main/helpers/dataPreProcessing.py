@@ -31,9 +31,23 @@ class dataPreProcess:
         plt.show()
         result = np.sort(df_scores)[0:plot_xlim]
         return result,df_scores
+    '''
+    NUMERIC NUMBERS OLUSAN DATAFRAME'I INCELEME
+    from sklearn.neighbors import LocalOutlierFactor
+    def lof(dataFrame,plot_xlim=50):
+        clf = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
+        clf.fit_predict(dataFrame)
+        df_scores = clf.negative_outlier_factor_
+        pd.DataFrame(np.sort(df_scores)).plot(stacked=True,xlim=[0,plot_xlim],style=".-",figsize=(10,5))
+        plt.show()
+        print(np.sort(df_scores)[0:plot_xlim])
+        return df_scores
+    print(lof(df.drop(categoric_cols,axis=1)))
+    
+    '''
     def dummies(self,categoric_cols):
         self.df = pd.get_dummies(self.df, columns = categoric_cols, drop_first=True), # Male:1,Female(default):0
-        return self.df 
+        return self.df.shape
     def oneHotEncoder(self,categoric_col):
         ohe = OneHotEncoder()
         transformed = ohe.fit_transform(self.df[[categoric_col]])
