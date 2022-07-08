@@ -74,6 +74,7 @@ macDf = pd.DataFrame(data=macValues, columns=["MAC"])
 df = pd.concat([df, dstDf, macDf], axis=1)
 df["DST_MAC"] = df["DST_MAC"].fillna(0)
 df["MAC"] = df["MAC"].fillna(0)
+df["MAC"] = df["MAC"].astype("str")
 print(df["DST_MAC"].describe())
 print(df["MAC"].describe())
 # Categoric Columns Visualisation
@@ -101,7 +102,10 @@ print(df["DST_SRC"].describe(), "\n", df["SRC"].describe())
 - DESTINATION NAT(DNAT) 146.112.255.155:443 ip'li dis agda bulunan pc 332 kez ic agdaki ana pc netine erismis
 '''
 df["DST_SRC"] = df["DST_SRC"].fillna(0)
+df["DST_SRC"] = df["DST_SRC"].astype("str")
 df["SRC"] = df["SRC"].fillna(0)
+df["SRC"] = df["SRC"].astype("str")
+
 dataUnderstand(df).categoricVisualisationBarplot("SRC", "Second")
 dataUnderstand(df).categoricVisualisationCountplot("SRC")
 dataUnderstand(df).categoricVisualisationBoxplot("SRC", "Second")
@@ -114,6 +118,7 @@ mac_requestDf = pd.DataFrame(data=mac_requestValue, columns=["MAC_Req"])
 df = pd.concat([df, mac_requestDf], axis=1)
 print(df["MAC_Req"].describe())
 df["MAC_Req"] = df["MAC_Req"].fillna(0)
+df["MAC_Req"] = df["MAC_Req"].astype("str")
 dataUnderstand(df).categoricVisualisationBarplot("MAC_Req", "Second")
 dataUnderstand(df).categoricVisualisationCountplot("MAC_Req")
 dataUnderstand(df).categoricVisualisationBoxplot("MAC_Req", "Second")
@@ -138,6 +143,7 @@ df["SPORT"] = df["SPORT"].astype("int32")
 print(dataUnderstand(df).catchOutliers("SPORT", plot=True))
 # Outlier values were discarded
 dataPreProcess(df).crush_outliers("SPORT", q1=0.25, q3=0.75)
+df.loc[df["SPORT"] < df["SPORT"].quantile(0.25), "SPORT"] = df["SPORT"].quantile(0.25) # ////////////////7
 # Data after outliers discarded
 print(dataUnderstand(df).catchOutliers("SPORT", plot=True))
 sns.lineplot(data=df, x="Second", y="SPORT", hue="flow_or_url")
@@ -161,6 +167,8 @@ df["DPORT"] = df["DPORT"].astype("int32")
 print(dataUnderstand(df).catchOutliers("DPORT", plot=True))
 # Outlier values were discarded
 dataPreProcess(df).crush_outliers("DPORT", q1=0.25, q3=0.75)
+df.loc[df["DPORT"] > df["DPORT"].quantile(0.95), "DPORT"] = df["DPORT"].quantile(0.95) # ///////////////////////
+df.loc[df["DPORT"] < df["DPORT"].quantile(0.25), "DPORT"] = df["DPORT"].quantile(0.25)
 print(dataUnderstand(df).catchOutliers("DPORT", plot=True))
 
 
@@ -230,177 +238,201 @@ print(dataUnderstand(df).catchOutliers("DPORT", plot=True))
 # SOURCE'DAN HEDEFE ARADA KAC SANIYE GECTIGINI BUL
 
 
-def source(df,value):
-    valueSources = []
-    max = 0
-    for i in range(60):
-        for j in range(43):
-            query = df.query(f'SRC == value and Second == {i} and Minute == {j}')
-            valueSources.append(query)
-    for dframe in valueSources:
-        if len(dframe) > max:
-            max = len(dframe)
-    for dframe in valueSources:
-        if len(dframe) == max:
-            fastestDf = dframe 
-    return valueSources, max, fastestDf
-valueSourcesDFrames, maxValues, fastestDFrames = [],[],[]
-for value in df["SRC"].unique():
-    val = '"'+str(value)+'"'
-    valueSources, max, fastestDf = source(df,val)
-    valueSourcesDFrames.append(valueSources)
-    maxValues.append(max)
-    fastestDFrames.append(fastestDf)
+# def source(df,value):
+#     valueSources = []
+#     max = 0
+#     for i in range(60):
+#         for j in range(43):
+#             query = df.query(f'SRC == value and Second == {i} and Minute == {j}')
+#             valueSources.append(query)
+#     for dframe in valueSources:
+#         if len(dframe) > max:
+#             max = len(dframe)
+#     for dframe in valueSources:
+#         if len(dframe) == max:
+#             fastestDf = dframe 
+#     return valueSources, max, fastestDf
+# valueSourcesDFrames, maxValues, fastestDFrames = [],[],[]
+# for value in df["SRC"].unique():
+#     val = '"'+str(value)+'"'
+#     valueSources, max, fastestDf = source(df,val)
+#     valueSourcesDFrames.append(valueSources)
+#     maxValues.append(max)
+#     fastestDFrames.append(fastestDf)
+
 
 # DATA PREPARATION
-# datetime(df, "Time")
-# df = df.drop("Time",axis=1)
+datetime(df, "Time")
+df = df.drop("Time",axis=1)
 
+for col in df.columns:
+    print(col,":\n",df[col].value_counts())
+
+df = df.drop("DST_MAC",axis=1)
+df = df.drop("MAC",axis=1)
+df = df.drop("DST_SRC",axis=1)
+df = df.drop("SRC",axis=1)
+df = df.drop("MAC_Req",axis=1)
+
+categoric_cols,numeric_cols,categoric_but_numeric = dataUnderstand(df.drop("ID",axis=1)).features()
+print("categoric_cols: ",categoric_cols,"\nnumeric_cols",numeric_cols,"\ncategoric_but_numeric: ",categoric_but_numeric)
+
+
+# Numeric Columns Visualisation
+dataUnderstand(df).numericVisulisation(numeric_cols)
+
+for col in df.columns:
+    print(dataUnderstand(df).col_Corr(col))
+'''
+Maximum flows yani herhangi internet baglantisina ihtiyac duymadan yalnizca bluetooth veya P2P Wi-Fi ile uygulamaya giris yaparken diger kullanicilar ile mesajlasabiliyorsunuz
+Maximum src yani SNAT: "ic" agdaki birden cok ana pc'nin "dis" agdaki herhangi bir ana pc'ye erismesine izin verir.
+Maximum TR_IST_AP_4
+Maximum protocol=udp yani veri gonderir ve alır, hızlıdır ama veri gonderimini garanti etmez
+Maximum sport: https://api.opendns.com/... yani source port
+Maximum dport: 53 yani hedef(destination) port
+
+'''
+
+
+# Categoric Columns Visualisation
+# dataUnderstand(df).categoricVisualisationBarplot(categoric_cols,"Second")
+# dataUnderstand(df).categoricVisualisationCountplot(categoric_cols)
+# dataUnderstand(df).categoricVisualisationBoxplot(categoric_cols,"Second")
+# dataUnderstand(df).categoricVisualisationStripplot(categoric_cols,"Second")
+# dataUnderstand(df).categoricVisualisationViolinplot(categoric_cols,"Second")
+# dataUnderstand(df).categoricVisualisationCountplot(categoric_but_numeric)
+
+
+# Missing Value Control and Fillna
+NaN_Columns,missingDf = dataUnderstand(df).missingValueTables()
+print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
+# NaN_Columns:  ['protocol', 'sport', 'dport']
+for col in NaN_Columns:
+    missingValue(df).categoric_Freq(col)
+NaN_Columns,missingDf = dataUnderstand(df).missingValueTables()
+print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
+
+
+
+    
+# categoric cols => numeric col
+df = df.drop("ID",axis=1)
+from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+for col in categoric_cols:
+    ohe = OneHotEncoder()
+    transformed = ohe.fit_transform(df[[col]])
+    transformed_array = transformed.toarray()
+    newDf = pd.DataFrame(transformed_array, columns=ohe.categories_)
+    df = df.drop(col,axis=1)
+    df = pd.concat([df,newDf], axis=1)
+    print(df.shape) 
+for col in categoric_but_numeric:
+    df[col] = preprocessor.fit_transform(np.array(df[col]).reshape(-1,1))
+    print(df.shape)
+for col in categoric_but_numeric:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    print(df.shape)
+
+print(df.columns)
+# correcting the structure of the column
+import re
+def columnsToString(df,columns):
+    array = []
+    for col in df.columns:
+        col = "".join(col)
+        col = re.sub("/","_",col)
+        col = re.sub(":","_",col)
+        col = re.sub("-","_",col)
+        array.append(col)
+    return array
+df.columns = columnsToString(df, columns)
+print(df.columns)
+
+
+# dport => There are Outlier Value
+df = df.drop(["]","UNKNOWN","(",],axis=1)
+print(dataUnderstand(df).num_summary("dport",plot=True)) # before
+dataPreProcess(df).crush_outliers("dport",q1=0.25,q3=0.75) # %95:17, %100:35
+df.loc[df["dport"] > df["dport"].quantile(0.95), "dport"] = df["dport"].quantile(0.95)
+print(dataUnderstand(df).num_summary("dport",plot=True)) # after
+targetDf = dataUnderstand(df).target_summary_with_cat_or_catNum("dport","Second")
+print(targetDf)
+
+
+# for col in df.columns: # burada tum columns control edildi
+#      print(dataUnderstand(df).num_summary(col,plot=True)) # mac_or_request => outlier value
+# print(dataUnderstand(df).num_summary("mac_or_request",plot=True)) # before
+for col in df.columns:
+    dataPreProcess(df).crush_outliers(col,q1=0.25, q3 = 0.75)
 # for col in df.columns:
-#     print(col,":\n",df[col].value_counts())
-
-# categoric_cols,numeric_cols,categoric_but_numeric = dataUnderstand(df.drop("ID",axis=1)).features()
-# print("categoric_cols: ",categoric_cols,"\nnumeric_cols",numeric_cols,"\ncategoric_but_numeric: ",categoric_but_numeric)
-
-
-# # Numeric Columns Visualisation
-# dataUnderstand(df).numericVisulisation(numeric_cols)
-
-
-# for col in df.columns:
-#     print(dataUnderstand(df).col_Corr(col))
-# '''
-# Maximum flows yani herhangi internet baglantisina ihtiyac duymadan yalnizca bluetooth veya P2P Wi-Fi ile uygulamaya giris yaparken diger kullanicilar ile mesajlasabiliyorsunuz
-# Maximum src yani SNAT: "ic" agdaki birden cok ana pc'nin "dis" agdaki herhangi bir ana pc'ye erismesine izin verir.
-# Maximum TR_IST_AP_4
-# Maximum protocol=udp yani veri gonderir ve alır, hızlıdır ama veri gonderimini garanti etmez
-# Maximum sport: https://api.opendns.com/... yani source port
-# Maximum dport: 53 yani hedef(destination) port
-
-# '''
-
-
-# # Categoric Columns Visualisation
-# # dataUnderstand(df).categoricVisualisationBarplot(categoric_cols,"Second")
-# # dataUnderstand(df).categoricVisualisationCountplot(categoric_cols)
-# # dataUnderstand(df).categoricVisualisationBoxplot(categoric_cols,"Second")
-# # dataUnderstand(df).categoricVisualisationStripplot(categoric_cols,"Second")
-# # dataUnderstand(df).categoricVisualisationViolinplot(categoric_cols,"Second")
-# # dataUnderstand(df).categoricVisualisationCountplot(categoric_but_numeric)
-
-
-# # Missing Value Control and Fillna
-# NaN_Columns,missingDf = dataUnderstand(df).missingValueTables()
-# print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
-# # NaN_Columns:  ['protocol', 'sport', 'dport']
-# for col in NaN_Columns:
-#     missingValue(df).categoric_Freq(col)
-# NaN_Columns,missingDf = dataUnderstand(df).missingValueTables()
-# print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
-
-
-# # categoric cols => numeric col
-# df = df.drop("ID",axis=1)
-# from sklearn.preprocessing import LabelEncoder,OneHotEncoder
-# for col in categoric_cols:
-#     ohe = OneHotEncoder()
-#     transformed = ohe.fit_transform(df[[col]])
-#     transformed_array = transformed.toarray()
-#     newDf = pd.DataFrame(transformed_array, columns=ohe.categories_)
-#     df = df.drop(col,axis=1)
-#     df = pd.concat([df,newDf], axis=1)
-#     print(df.shape)
+#     print(dataUnderstand(df).checkOutlier(col,q1=0.25,q3=0.75))
+# for col in numeric_cols:
+#     dataUnderstand(df).num_summary(col,plot=True)
 # for col in categoric_but_numeric:
-#     le = LabelEncoder()
-#     df[col] = le.fit_transform(df[col])
-#     print(df.shape)
+#     print(dataUnderstand(df).target_summary_with_cat_or_catNum(col,"Second"))
+for col in categoric_cols:
+    print(dataUnderstand(df).target_summary_with_cat_or_catNum(col,"Second"))
 
-# print(df.columns)
-# # correcting the structure of the column
-# import re
-# def columnsToString(df,columns):
-#     array = []
-#     for col in df.columns:
-#         col = "".join(col)
-#         col = re.sub("/","_",col)
-#         col = re.sub(":","_",col)
-#         col = re.sub("-","_",col)
-#         array.append(col)
-#     return array
-# df.columns = columnsToString(df, columns)
-# print(df.columns)
-# # for col in df.columns:
-# #     print(dataUnderstand(df).col_Corr(col))
-
-# # dport => There are Outlier Value
-# df = df.drop(["]","UNKNOWN","(",],axis=1)
-# #print(dataUnderstand(df).num_summary("dport",plot=True)) # before
-# dataPreProcess(df).crush_outliers("dport",q1=0.25,q3=0.75) # %95:17, %100:35
-# df.loc[df["dport"] > df["dport"].quantile(0.95), "dport"] = df["dport"].quantile(0.95)
-# #print(dataUnderstand(df).num_summary("dport",plot=True)) # after
-# targetDf = dataUnderstand(df).target_summary_with_cat_or_catNum("dport","Second")
-# #print(targetDf)
-
-
-# # for col in df.columns: # burada tum columns control edildi
-# #     print(dataUnderstand(df).num_summary(col,plot=True)) # mac_or_request => outlier value
-# #print(dataUnderstand(df).num_summary("mac_or_request",plot=True)) # before
+# dataPreProcess(df).crush_outliers("request_",plot=True, q1=0.25,q3=0.75)
 # dataPreProcess(df).crush_outliers("mac_or_request",q1=0.25,q3=0.75)
-# #print(dataUnderstand(df).num_summary("mac_or_request",plot=True)) # after
+# dataPreProcess(df).crush_outliers("protocol=tcp",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("protocol=icmp6",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("protocol=2",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("protocol=0",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("POST",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("urls",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("flows",q1=0.25,q3=0.75)
+# dataPreProcess(df).crush_outliers("events",q1=0.25,q3=0.75)
 
 
-# #print(df.columns)
 
-# # X_train,X_test,y_train, y_test = MachineLearning(df).get_dataset("TR_IST_AP_3",0.1,123)
-# # X_train, X_test = MachineLearning(df).standardScaler(X_train, X_test)
-# # from sklearn.linear_model import LogisticRegression
-# # from sklearn.model_selection import cross_val_score
-# # from sklearn.metrics import confusion_matrix,accuracy_score
-# # lr = LogisticRegression()
-# # lr.fit(X_train, y_train)
-# # y_pred = lr.predict(X_test)
-# # cv_result = cross_val_score(lr, X_train, y_train, scoring="accuracy",cv=10)
-# # cv_mean = cv_result.mean()
-# # acc_score = accuracy_score(y_test, y_pred)
-# # sns.heatmap(confusion_matrix(y_test, y_pred),annot=True,fmt=".2f",cmap="Greens")
-# # plt.title("Log Reg:{}".format(acc_score))
-# # plt.show()
+#print(df.columns)
 
-
-# # resultDf = MachineLearning(df).score("protocol=tcp",0.3,123)
-# # #print("Model: {}\nCv Mean: {}\nAccuracy Score: {}".format(model,cv_mean,acc_score))
-# # print(resultDf)
-
-# '''
-#                         cv_mean  acc_score
-# LogisticReg            0.999714   1.000000
-# KNN                    0.944714   0.948000
-# SupportVectorMachines  0.757143   0.753000
-# DecisionTree           0.999857   1.000000
-# RandomForest           0.999857   1.000000
-# Adaboost               1.000000   1.000000
-# GradientBoost          0.999857   1.000000
-# XGBoost                1.000000   1.000000
-# DecisionTree           0.999857   1.000000
-# LightGBM               0.999857   0.999667
-# CatBoost               0.999857   1.000000
-# '''
-# # from sklearn.ensemble import AdaBoostClassifier
-# # adaboost = AdaBoostClassifier()
-# # pre_score,fScore, test_summary, train_summary = MachineLearning(df).get_model(adaboost,"TR_IST_AP_3",0.1,123,"accuracy",10)
-# # print("f1_score:\n",fScore,"\nprecision_score: \n",pre_score,
-# #       "\nTest Summary:\n ",test_summary,"\nTrain Summary: \n",train_summary)
-
-
-# # print(df["protocol=udp"].value_counts(),"\n\n")
-# # print(df["protocol=icmp6"].value_counts())
-
-
-# sns.jointplot(data=df, x="Second",y="mac_or_dst",color=("purple"))
+# X_train,X_test,y_train, y_test = MachineLearning(df).get_dataset("TR_IST_AP_3",0.1,123)
+# X_train, X_test = MachineLearning(df).standardScaler(X_train, X_test)
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.model_selection import cross_val_score
+# from sklearn.metrics import confusion_matrix,accuracy_score
+# lr = LogisticRegression()
+# lr.fit(X_train, y_train)
+# y_pred = lr.predict(X_test)
+# cv_result = cross_val_score(lr, X_train, y_train, scoring="accuracy",cv=10)
+# cv_mean = cv_result.mean()
+# acc_score = accuracy_score(y_test, y_pred)
+# sns.heatmap(confusion_matrix(y_test, y_pred),annot=True,fmt=".2f",cmap="Greens")
+# plt.title("Log Reg:{}".format(acc_score))
 # plt.show()
 
 
+# resultDf = MachineLearning(df).score("protocol=tcp",0.3,123)
+# #print("Model: {}\nCv Mean: {}\nAccuracy Score: {}".format(model,cv_mean,acc_score))
+# print(resultDf)
+
+'''
+                        cv_mean  acc_score
+LogisticReg            0.999714   1.000000
+KNN                    0.944714   0.948000
+SupportVectorMachines  0.757143   0.753000
+DecisionTree           0.999857   1.000000
+RandomForest           0.999857   1.000000
+Adaboost               1.000000   1.000000
+GradientBoost          0.999857   1.000000
+XGBoost                1.000000   1.000000
+DecisionTree           0.999857   1.000000
+LightGBM               0.999857   0.999667
+CatBoost               0.999857   1.000000
+'''
+# from sklearn.ensemble import AdaBoostClassifier
+# adaboost = AdaBoostClassifier()
+# pre_score,fScore, test_summary, train_summary = MachineLearning(df).get_model(adaboost,"TR_IST_AP_3",0.1,123,"accuracy",10)
+# print("f1_score:\n",fScore,"\nprecision_score: \n",pre_score,
+#       "\nTest Summary:\n ",test_summary,"\nTrain Summary: \n",train_summary)
 
 
+# print(df["protocol=udp"].value_counts(),"\n\n")
+# print(df["protocol=icmp6"].value_counts())
 
 
+sns.jointplot(data=df, x="Second",y="mac_or_dst",color=("purple"))
+plt.show()
