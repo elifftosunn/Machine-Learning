@@ -46,7 +46,7 @@ todo3 ={"name":"Selin","text":"My fourth todo!",
      "lesson":["Object Oriented Programming","data structures and algorithms"],
      "subject":["Data Science","Machine Learning"]}
 #db.todos.insert_one(todo3)
-result4 = db.todos.find_one({"subject":"Data Science"})
+result4 = db.todos.find_one({"subject":"Data Science"}) # collection
 #print(result4)
 
 
