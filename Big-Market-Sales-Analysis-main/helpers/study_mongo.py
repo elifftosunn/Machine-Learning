@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 
 db = MongoClient(host="localhost",port=27017)
 db = db.SupermarketDatabase.SupermarketCollection
-#print(db.list_collection_names())
+print(db.list_collection_names())
 
 # *********************************** FIND AND COUNT ********************************************
 values = db.find({})
