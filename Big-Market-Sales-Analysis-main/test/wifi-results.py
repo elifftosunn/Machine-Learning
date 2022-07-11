@@ -34,7 +34,7 @@ maxFlowAllow = flowAllowWifi.sort_values(["RepeatNumber"],ascending=False).head(
 print("maxFlowAllow:protocol=tcp => ",len(maxFlowAllow.loc[maxFlowAllow["protocol"] == "protocol=tcp"])) # => 10 tcp, 32 udp used
 # protocol => udp kullanildiginda daha fazla giris denemeleri oluyor
 print(maxFlowAllow["mac_or_request"])
-
+  
 '''
 mac=F4:D4:88:8A:A4:63
 mac=F4:46:37:8B:43:EA
