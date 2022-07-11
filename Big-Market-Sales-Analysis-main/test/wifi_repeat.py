@@ -71,7 +71,7 @@ df_copy = df.copy()
 # def dummies(dataFrame, categoric_cols):
 #     dataFrame = pd.get_dummies(dataFrame,columns=categoric_cols,drop_first=True)
 #     return dataFrame
-# df = dummies(df, categoric_cols)
+# df = dummies(df, categoric_cols) 
 
 # # Bu yontem ile columns yapilari bozuluyor
 # # for col in categoric_cols:
