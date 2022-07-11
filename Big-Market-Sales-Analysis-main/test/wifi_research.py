@@ -39,7 +39,7 @@ df_copy = df.copy()
 # FEATURE ENGINEERING
 # - kac tane disaridan dst geliyor ve kac saniyede geliyor
 
-
+   
 def separatingColon(df, col, split, sep1, sep2):
     firstValues, secondValues = [], []
     firstCount, secondCount = 0, 0
