@@ -1,0 +1,4 @@
+Minute,Second,RepeatNumber,Server,TR_IST_AP,flow_or_url,allow_or_src,snat_or_dnat,mac_or_dst,mac_or_request,protocol,sport,dport
+11,49,4,server-176.53.2.142.as42926.net,TR_IST_AP_8,urls,src=172.19.0.195:55079,dst=40.91.80.89:443,mac=F4:46:37:8A:F5:57,request:,UNKNOWN,https://array801.prod.do.dsp.mp.microsoft.com/...,0
+11,49,4,server-176.53.2.142.as42926.net,TR_IST_AP_8,urls,src=172.19.0.195:55080,dst=40.91.73.169:443,mac=F4:46:37:8A:F5:57,request:,UNKNOWN,https://array809.prod.do.dsp.mp.microsoft.com/...,0
+11,49,4,server-176.53.2.142.as42926.net,TR_IST_AP_8,urls,src=172.19.0.195:55081,dst=52.148.148.114:443,mac=F4:46:37:8A:F5:57,request:,UNKNOWN,https://array813.prod.do.dsp.mp.microsoft.com/...,0
