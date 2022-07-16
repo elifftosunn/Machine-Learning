@@ -1,2 +1,2 @@
-Minute,Second,RepeatNumber,Server,TR_IST_AP,flow_or_url,allow_or_src,snat_or_dnat,mac_or_dst,mac_or_request,protocol,sport,dport
-37,38,2,195.175.205.46.static.turktelekom.com.tr,2_A1,urls,src=192.168.144.255:37532,dst=209.206.58.151:443,mac=DA:11:82:15:C8:EF,request:,UNKNOWN,https://n326.network-auth.com/...,0
+Minute,Second,RepeatNumber,Server,TR_IST_AP,flow_or_url,allow_or_src,snat_or_dnat,mac_or_dst,mac_or_request,protocol,sport,dport,NumberEntryToSite
+37,38,2,195.175.205.46.static.turktelekom.com.tr,2_A1,urls,src=192.168.144.255:37532,dst=209.206.58.151:443,mac=DA:11:82:15:C8:EF,request:,UNKNOWN,https://n326.network-auth.com/...,0,1
