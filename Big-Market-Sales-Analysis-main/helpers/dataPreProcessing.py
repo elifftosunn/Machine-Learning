@@ -73,7 +73,7 @@ for col in categoric_but_numeric:
 (8503, 14) -15
 (8503, 15) -17
 (8503,)  -32
-(8503,) -32
+(8503,)  -32
 
 labelEncode = LabelEncoder()
 for col in categoric_cols:
