@@ -84,7 +84,7 @@ def NumberOfServerResult():
         # MAC_OR_DST DST ILE BASLAYANLAR SINIRLANIYORRRRRRRRRRRRRRRRRRRR
         # if value["Server"] not in serverTotal:
         #     serverTotal.append(value["Server"])
-
+            
     # for server in serverTotal:
     #     countServer = numberServer(columns,queryServerDst,server)
     #     serverNumber[server] = countServer 
@@ -167,7 +167,7 @@ src=172.19.0.166:65044       1
 src=172.19.0.71:55705        1
 src=172.19.0.173:54845       1
 '''
-
+                  
 # HANGI PROTOCOL ILE GELIYOR VE PROTOCOL'UN GELME SURELERI NEDIR?
 df = pd.read_csv("datas\processedDatas\mongo-wifi.csv")
 # print(df["Server"].value_counts())
