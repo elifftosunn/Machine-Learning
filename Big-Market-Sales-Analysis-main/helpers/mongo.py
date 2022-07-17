@@ -202,7 +202,7 @@ def main():
     #dateHourMinuteSecond()
    
     
-    class Question(object): # CLASS'A DONUSTURRRRRRRRRRRRRRRRRRRRRRRRR
+    class Question(object): 
         pass
     def SecondOrMinute(columns,query,second,minute):
         FeatureResult = mongoResult._mongoInformation.dataFindQuery(query,columns)    
