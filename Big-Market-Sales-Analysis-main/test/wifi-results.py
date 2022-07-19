@@ -1,7 +1,8 @@
 import pandas as pd
+import numpy as geek
 import matplotlib.pyplot as plt
 import seaborn as sns
-# from helpers.data_helper import *
+from helpers.data_helper import *
 import requests, json, re
 from tabulate import tabulate
 
@@ -46,9 +47,18 @@ def ipQuery():
       
        print(tabulate(table))
 #ipQuery()  
+dfFlowOne = pd.read_csv("datas/mongoData/SecondOnBinDataFlowAllowWifi.csv")
+dfFlowTwo = pd.read_csv("onBinDataFlowsAllowWifi.csv")
+df_Flow = pd.concat([dfFlowOne,dfFlowTwo],ignore_index=True)
+# sns.lineplot(data=df, x = "Second", y="RepeatNumber")
+# plt.show()
+# sns.lineplot(data=df, x = "Minute", y="RepeatNumber")
+# plt.show()
 
 
-def sourceIdDestinationIdQuery():
+
+
+def sourceIdDestinationIdQuery(): ####################### flows
     for port in df["snat_or_dnat"].unique():
         sourcePort = df[df["snat_or_dnat"] == port]
         print("{} source port ip'li kisinin destination ips: ".format(port))
@@ -58,11 +68,16 @@ def sourceIdDestinationIdQuery():
         sns.countplot(sourcePort["mac_or_dst"])
         plt.xticks(rotation=90)
         plt.title("{} sites that a person with a port ip visits the most".format(port))
-        plt.show()
-#sourceIdDestinationIdQuery()
-df = pd.read_csv("onBinDataUrls_Src.csv")
+        plt.show()      
+# sourceIdDestinationIdQuery()
+dfOneUrls = pd.read_csv("onBinDataUrls_Src.csv")
+dfTwoUrls = pd.read_csv("datas/mongoData/SecondOnBinDataUrls_Src.csv")
+df_Urls = pd.concat([dfOneUrls,dfTwoUrls])
+
+df = pd.concat([df_Flow,df_Urls])
+
 # hangi sitelerde ne sıklıkta ne kadar kaldiklari
-def macAddressMostVisitSites():  
+def macAddressMostVisitSites():   ######################## urls
     for mac in df["mac_or_dst"].unique():
         moreMac = df.loc[df["mac_or_dst"] == mac]
         print("Mac Adresli Kisinin Bilgileri: ",mac)
@@ -73,35 +88,134 @@ def macAddressMostVisitSites():
         plt.title("{} sites that a person with a mac address visits the most".format(mac))
         plt.show()
 # macAddressMostVisitSites()
-print(df["mac_or_dst"].unique())
+#print(df["mac_or_dst"].unique())
 # for every mac address every sport(ziyaret edilen sitelerin) which minute, second and repeat number 
-def everyMacAddressSportQuery(mac):
-    sportList = []
-    OnemacAddressDf = df.loc[df["mac_or_dst"] == mac]
+def everyMacAddressSportQuery(mac,column):
+    sportList = [] # her sport url icin dataframe create and tamamini listeye koyma
+    OnemacAddressDf = df.loc[df[column] == mac]
     for sport in OnemacAddressDf["sport"].unique():
         sportDf = OnemacAddressDf.loc[OnemacAddressDf["sport"] == sport]
+        sportDf["NumberEntryToSite"] = len(sportDf) # number of entries to the site
+        # print(len(sportDf)) # every biri farklı sport, farkli linke gidiyor
         sportList.append(sportDf)
     return sportList
-# everyMacAddressSportQuery all data uzerindeki mac address's sport address
-def totalMacSportDF():
-    totalSportList = {}
-    for mac in df["mac_or_dst"].unique():
-        sportList = everyMacAddressSportQuery(mac)
+# everyMacAddressSportQueryUrls all data uzerindeki mac address's sport address
+# sportList = everyMacAddressSportQuery("mac=F4:46:37:D8:6D:B9","mac_or_dst") # Bu kısım for urls
+
+def totalMacSportDF(macColumn):
+    totalSportList = {} # mac adreslerine gore gruplara ayirma 
+    for mac in df[macColumn].unique():
+        sportList = everyMacAddressSportQuery(mac,macColumn)
         totalSportList[mac] = sportList
     return totalSportList
-        # her bir mac adresinin her bir site ziyareti(sport) dataframe olarak cekildi. => totalSportList
 
-def everyMacCsvCreate():
-    totalMacDf = []
-    for mac in df["mac_or_dst"].unique():
-        everyMacAddressDataFrame = df.loc[df["mac_or_dst"] == mac]
-        totalMacDf.append(everyMacAddressDataFrame)
+
+
+# her bir mac adresinin her bir site ziyareti(sport) dataframe olarak cekildi. => totalSportList
+# totalSportListUrls = totalMacSportDF("mac_or_dst") # for urls
+# totalSportList = totalMacSportDF("mac_or_request")
+
+
+################################# BURADAN ITIBAREN URLS AYRILIYOR AND CONCAT EDILIYOR
+def everyMacAddressNumberEntrySites(df,macColumn):
+    totalMacDf = {}
+    sportList = []
+    for mac in df[macColumn].unique(): # mac_or_dst, mac_or_request
+        everyMacAddressDataFrame = df.loc[df[macColumn] == mac]
+        for sport in everyMacAddressDataFrame["sport"].unique():
+            sportDf = everyMacAddressDataFrame.loc[everyMacAddressDataFrame["sport"] == sport]
+            sportDf["NumberEntryToSite"] = len(sportDf) # number of entries to the site
+            # print(len(sportDf)) # every biri farklı sport, farkli linke gidiyor
+            sportList.append(sportDf) 
+        totalMacDf[mac] = everyMacAddressDataFrame
+    return totalMacDf,sportList
+
+totalMacDfUrls,sportListUrls = everyMacAddressNumberEntrySites(df_Urls,"mac_or_dst")
+totalMacDf, sportList = everyMacAddressNumberEntrySites(df_Flow,"mac_or_request")
+
+def dataFrameConcat(df,sportList_Or_Urls,mac,macColumn): # mac addressleri ayni olan dataframeleri birlestirme
+    sameMacAddressDf = [] 
+    for macDf in sportList_Or_Urls: 
+        # print(macDf[macColumn].unique())
+        if macDf[macColumn].unique() == mac:
+            sameMacAddressDf.append(macDf) 
+    newDf = pd.concat(sameMacAddressDf) # ValueError: No objects to concatenate => Empty List
+    return newDf 
+
+def everyMacCsvCreate(generalDf,dframe,macColumn,sportList_Or_Urls): #  mac addressleri ayni olan dataframeleri birlestirme
+    macList = generalDf[macColumn].unique() #  df_Flow aldigim icin unique mac degerlerinde url'de olmayan mac address'i denk geldi
+    totalConcatDf = []  
+    for i in range(len(macList)):
+        newDf = dataFrameConcat(dframe,sportList_Or_Urls,macList[i],macColumn)
+        totalConcatDf.append(newDf)
+        # newDf.to_csv("datas/urls_Src_Datas/macDataFrame{}.csv".format(i+1),index=False)
+        # newDf.to_csv("datas/urls_Src_Datas/SecondMacDataFrame{}.csv".format(i+1), index=False)
+        # newDf.to_csv("datas/flow_allow_Datas/SecondMacFlowAllowDataFrame{}.csv".format(i+1),index=False)
+    return totalConcatDf
+# everyMacCsvCreate(df,"mac_or_dst")
+totalConcatDf = everyMacCsvCreate(df_Flow,totalMacDf,"mac_or_request",sportList)
+totalConcatDfUrls = everyMacCsvCreate(df_Urls,totalMacDfUrls, "mac_or_dst",sportListUrls)###################################
+
+# wifi'e baglanmasinin uzerinden ne kadar zaman gecmis => recency # today - last day
+# toplamda kac kez wifi'e baglanmis bu zamana kadar => monetary 
+# baglanma sıklıgıı nedir (yani aradan ne kadar zaman gecip de baglaniyor) => frequency
+# siteye en cok giris hangi mac adreslerinden  hangi dakika ve saniyelerde gerceklesiyor?
+# internete baglanim hangi dakika ve saniyede en fazla gerceklesmis 
+# kisileri kumeleme yap yogunluga gore:  hangi dakika ve saniyede  hangi mac adresinde  yogunluk var 
+
+
+# for dataframe in totalConcatDf:
+#     # dataUnderstand(dataframe).num_to_cat("NumberEntryToSite",)   
+#     # print(max(dataframe["NumberEntryToSite"]))
+#     print(dataframe["NumberEntryToSite"].value_counts())
+#     print(max(dataframe["NumberEntryToSite"]))
     
-    # For Every Mac Address Csv File Create
-    # count = 0
-    # for df in totalMacDf:
-    #     df.to_csv("datas/urls_Src_Datas/macDataFrame{}.csv".format(count+1),index=False)
-    #     count += 1
+# newDf = pd.read_csv("datas/urls_Src_Datas/SecondMacDataFrame1.csv")
+# def num_to_cat(self,feature,*args):
+totalDf = pd.concat(totalConcatDf)
+totalDfUrls = pd.concat(totalConcatDfUrls) # ################################
+generalTotalDf = pd.concat([totalDf,totalDfUrls])
+generalTotalDf.to_csv("datas/TotalDatas/totalData.csv",index=False)
+# maxEntryToSite = totalDf.loc[totalDf["NumberEntryToSite"] == 72]
+# dataUnderstand(dataframe).num_to_cat("NumberEntryToSite",10,20,30,40,50,60,73) 
+
+# toplamda kac kez wifi'e baglanmis bu zamana kadar => monetary 
+def totalEntrySites():  
+    totalGeneral = {} 
+    for dataframe in totalConcatDf: # every df
+        # oneMac = dataframe.loc[dataframe["mac_or_request"] == mac]#her mac address df 
+        total = 0
+        for value in dataframe["NumberEntryToSite"]:
+            total += 1
+        print(dataframe["mac_or_request"].unique())
+        totalGeneral[geek.array_str(dataframe["mac_or_request"].unique())] = total
+    return totalGeneral    
+#totalGeneral = totalEntrySites()     
+# baglanma sıklıgı nedir (yani aradan ne kadar zaman gecip de baglaniyor) => frequency
+# oneMac = totalDf[totalDf["mac_or_request"] == "mac=F4:46:37:8B:43:EA"]
+
+# plt.figure(figsize=(12,6))
+# sns.scatterplot(data = oneMac, x = "Second", y = "RepeatNumber", hue = "NumberEntryToSite")
+# plt.show()
+
+# siteye en cok giris hangi mac adreslerinden  hangi dakika ve saniyelerde gerceklesiyor?
+   
+# for mac in totalDfUrls["mac_or_dst"].unique():   
+#     macDf = totalDfUrls.loc[totalDfUrls["mac_or_dst"] == mac]
+#     macDf = macDf.reset_index()
+#     plt.figure(figsize=(20,8))
+#     # sns.pairplot(data=macDf)
+#     # plt.show()
+#     sns.lineplot(data=macDf, x = "RepeatNumber", y = "NumberEntryToSite")
+#     plt.show()
+
+# kisileri kumeleme yap yogunluga gore:  hangi dakika ve saniyede  hangi mac adresinde  yogunluk var 
+# HANGI SITELERE KAC KEZ GIRECGININ TAHMINI YAPILABILIR
+
+
+
+
+
 
 
 
@@ -122,12 +236,10 @@ def everyMacCsvCreate():
 # ip = socket.gethostbyname(url)
 # print('CODE HUB')
 # response = DbIpCity.get(ip, api_key='free')
-# print('İP ADRESİ: ', ip)
-# print('ŞEHİR: ', response.city)
-# print('ÜLKE: ', response.country)
-# print('BÖLGE: ', response.region) 
-
-
+# print('IP ADDRESS: ', ip)
+# print('City: ', response.city)
+# print('Country: ', response.country)
+# print('BOLGE: ', response.region) 
 
 
 
@@ -341,11 +453,3 @@ def everyMacCsvCreate():
 
 # data = urlsSrcWifi.loc[urlsSrcWifi["mac_or_dst"] == "mac=BC:09:1B:DD:22:28"]
 # print(data["RepeatNumber"].sort_values(ascending=False))
-
-
-
-
-
-
-
-
