@@ -1,0 +1,2 @@
+Minute,Second,RepeatNumber,Server,TR_IST_AP,flow_or_url,allow_or_src,snat_or_dnat,mac_or_dst,mac_or_request,protocol,sport,dport,NumberEntryToSite
+54,7,1,merakimulti,journals,flows,allow,src=172.19.0.148,dst=172.18.14.96,request:,protocol=udp,https://api.opendns.com/...,dport=53,1

@@ -1,0 +1,12 @@
+Minute,Second,RepeatNumber,Server,TR_IST_AP,flow_or_url,allow_or_src,snat_or_dnat,mac_or_dst,mac_or_request,protocol,sport,dport,NumberEntryToSite
+14,17,8,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=8.8.8.8,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=44098,dport=853,1
+14,18,7,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=172.217.17.234,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=36826,dport=443,2
+24,41,2,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=172.217.17.234,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=36826,dport=443,2
+16,15,2,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=8.8.8.8,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=44102,dport=853,1
+16,15,2,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=172.217.169.170,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=46074,dport=443,2
+26,42,1,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=172.217.169.170,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=46074,dport=443,2
+16,16,1,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=142.250.187.106,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=41836,dport=443,1
+17,0,5,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=173.194.69.188,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=51592,dport=5228,3
+48,8,4,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=173.194.69.188,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=51592,dport=5228,3
+19,16,13,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=173.194.69.188,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=51592,dport=5228,3
+24,41,2,server-176.53.2.142.as42926.net,TR_IST_AP_3,flows,allow,src=172.18.123.127,dst=172.217.169.170,mac=3A:B6:FC:64:B0:8B,protocol=tcp,sport=46052,dport=443,1
