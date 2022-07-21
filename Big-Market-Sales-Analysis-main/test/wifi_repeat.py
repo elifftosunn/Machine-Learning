@@ -22,6 +22,8 @@ def datetime(df, time):
     df[time] = pd.to_datetime(df[time])
     df["Minute"] = df[time].dt.minute
     df["Second"] = df[time].dt.second
+    df["Hour"] = df[time].dt.hour
+    df.drop(time,axis=1,inplace=True)
 
 
 datetime(df, "Time")
