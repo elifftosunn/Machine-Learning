@@ -31,6 +31,7 @@ def outlierValues(df,col):
     return df.loc[(df["RepeatNumber"] < lowerLimit) | (df["RepeatNumber"] > upperLimit)]
 # print(outlierValues(df, "NumberEntryToSite"),"\n\n",outlierValues(df, "RepeatNumber"))
 # print(dataUnderstand(df).catchOutliers("RepeatNumber",plot=True,q1 = 0.1, q3 = 0.9)) # 5 rows
+
 '''
      Minute  Second  RepeatNumber  ...        sport      dport NumberEntryToSite
 325      12      19            30  ...  sport=61820   dport=53                 2
