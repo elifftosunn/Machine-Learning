@@ -19,17 +19,16 @@ from helpers.machineLearning import *
 
 columns = ["Month", "Day", "Time", "Server", "Unnamed", "ID", "TR_IST_AP", "flow_or_url", "allow_or_src", "SNAT_or_DNAT", "mac_or_dst",
            "mac_or_request", "protocol", "sport", "dport"]
+dictMonths = {"Jan":1,"Feb":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
+
 # df = pd.read_csv("datas/turcom-wifi.txt", error_bad_lines=False,
 #                  sep=" ", header=None, nrows=10000, names=columns)
 
-df = pd.read_csv("datas/turcom-wifi.txt", error_bad_lines=False,
-                 sep=" ", header=None, nrows=20000, names=columns)
-df = df.drop(range(10000),axis=0)
+df = pd.read_csv("/home/senol/Project/firewal-log-dataset/deneme.txt", error_bad_lines=False,
+                 sep=" ", header=None, names=columns)
 df = df.drop(["Unnamed","ID"], axis=1)
 
-
-def processedDataCsvCreate():
-    mongodf = df.drop(["Month","Day"],axis=1)
+def processedDataCsvCreate(mongodf):
     # Missing Value Control and Fillna and MongoDB Throw
     NaN_Columns,missingDf = dataUnderstand(mongodf).missingValueTables()
     print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
@@ -39,31 +38,42 @@ def processedDataCsvCreate():
     print("NaN_Columns: ",NaN_Columns,"\n",missingDf)
     from datetime import time,date,datetime
     mongodf["Date"] = pd.to_datetime(mongodf["Time"]) 
-    mongodf.drop("Time",axis=1, inplace=True)
+    print(mongodf["Date"]) #   2022-07-27 00:02:29       
+    for keyMonth, valueMonth in dictMonths.items():
+        for i in range(len(df)):
+            if df.iloc[i,0] == keyMonth:
+                df.iloc[i,0] = valueMonth
     def get_date(dt,year=None, month=None, day=None):  # bu kisimda bir dahakinde hata alabilirsin 
         '''Returns now, with the given parts overwritten'''
-        kwargs = {}
-        if year  : kwargs['year']  = year
-        if month : kwargs['month'] = month
-        if day   : kwargs['day'] = day
-        if kwargs : return dt.replace(**kwargs)
+        kwargs = {} 
+        # print("year: ",year)
+        if year  : kwargs['year']  = year  # dt.year = year
+        # print("month: ",month)
+        if month : kwargs['month'] = month  # dt.month = month
+        # print("day: ",day)
+        if day   : kwargs['day'] = day      # dt.day = day
+        if kwargs : return dt.replace(**kwargs) 
         else      : return dt
-    for date in mongodf["Date"]:
-        mongodf.iloc[i,-1] = get_date(date,2022,6,27)
-
+    for i in range(len(mongodf)):
+        print(mongodf.iloc[i,-1])
+        mongodf.iloc[i,-1] = get_date(mongodf.iloc[i,-1],2022,df.iloc[i,0], df.iloc[i,1]) #   mongodf.iloc[i,-1]  => Tam Tarih
+        print(mongodf.iloc[i,-1])
+    mongodf = mongodf.drop(["Month","Day","Time"],axis=1)
+    return mongodf  # mongodf.iloc[i,0] mongodf.iloc[i,1]
     # mongodf.to_csv("datas/processedDatas/secondTenThousandProcessData.csv",index=False)
-processedDataCsvCreate()
-
-
-
+df = processedDataCsvCreate(df)
+# df.to_csv("datas/TotalDatas/lastData.csv",index=False)) # 
+df.to_csv("datas/TotalDatas/lastData.csv",index=False)
 
 def datetime(df, time):
     df[time] = pd.to_datetime(df[time])
     df["Minute"] = df[time].dt.minute
     df["Second"] = df[time].dt.second
     df["Hour"] = df[time].dt.hour
-
-
+    df.drop("Date",axis=1,inplace=True)
+# datetime(df, "Date")
+# print(df.describe(),"\n\n",df.head(),"\n\n",df.info())
+# df.to_csv("datas/mongoData/deneme.csv",index=False)
 # datetime(df, "Time")
 # print(dataUnderstand(df))
 # df_copy = df.copy()
