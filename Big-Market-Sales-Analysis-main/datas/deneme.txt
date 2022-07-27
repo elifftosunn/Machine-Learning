@@ -1,0 +1,15 @@
+Jun 27 00:02:26 server-176.53.2.142.as42926.net  1656277346.997560178 TR_IST_AP_4 flows allow src=172.19.0.173 dst=172.18.14.96 mac=F4:46:37:8A:F5:A7 protocol=udp sport=64734 dport=53
+Jun 27 00:02:26 server-176.53.2.142.as42926.net  1656277347.055192338 TR_IST_AP_4 flows allow src=172.19.0.173 dst=172.18.14.225 mac=F4:46:37:8A:F5:A7 protocol=udp sport=64735 dport=53
+Jun 27 00:02:26 server-176.53.2.142.as42926.net  1656277347.119769618 TR_IST_AP_4 flows allow src=172.19.0.173 dst=208.67.222.222 mac=F4:46:37:8A:F5:A7 protocol=udp sport=64737 dport=443
+Jun 27 00:02:27 server-176.53.2.142.as42926.net  1656277347.308682258 TR_IST_AP_4 flows allow src=172.19.0.117 dst=172.18.14.96 mac=F4:46:37:D8:6D:B9 protocol=udp sport=62035 dport=53
+Jun 27 00:02:27 server-176.53.2.142.as42926.net  1656277347.322131698 TR_IST_AP_4 flows allow src=172.19.0.117 dst=192.111.5.0 mac=F4:46:37:D8:6D:B9 protocol=tcp sport=52019 dport=443
+Jun 27 00:02:27 server-176.53.2.142.as42926.net  1656277347.395444498 TR_IST_AP_4 urls src=172.19.0.117:52019 dst=192.111.5.0:443 mac=F4:46:37:D8:6D:B9 request: UNKNOWN https://cloud-ec-asn.eu.amp.cisco.com/...
+Jun 27 00:02:27 server-176.53.2.142.as42926.net  1656277347.434199228 TR_IST_AP_8 flows allow src=172.19.0.155 dst=172.18.14.96 mac=F4:46:37:8B:66:DB protocol=udp sport=64173 dport=53
+Jun 27 00:02:27 server-176.53.2.142.as42926.net  1656277347.449575548 TR_IST_AP_8 flows allow src=172.19.0.155 dst=172.18.14.96 mac=F4:46:37:8B:66:DB protocol=udp sport=61002 dport=53
+Jun 27 00:02:28 server-176.53.2.142.as42926.net  1656277348.838605618 TR_IST_AP_4 flows allow src=172.19.0.148 dst=20.199.120.85 mac=F4:46:37:8B:43:EA protocol=tcp sport=64573 dport=443
+Jun 27 00:02:29 server-176.53.2.142.as42926.net  1656277349.838373618 TR_IST_AP_4 flows allow src=172.19.0.173 dst=20.199.120.151 mac=F4:46:37:8A:F5:A7 protocol=tcp sport=52864 dport=443
+Jun 27 00:02:29 server-176.53.2.142.as42926.net  1656277349.900330424 TR_IST_AP_3 flows allow src=172.19.0.111 dst=172.18.14.96 mac=BC:09:1B:F0:66:C1 protocol=udp sport=51385 dport=53
+Jun 27 00:02:29 server-176.53.2.142.as42926.net  1656277349.901861944 TR_IST_AP_3 flows allow src=172.19.0.111 dst=172.18.14.225 mac=BC:09:1B:F0:66:C1 protocol=udp sport=51386 dport=53
+Jun 27 00:02:29 server-176.53.2.142.as42926.net  1656277350.153265789 TR_IST_AP_8 flows allow src=172.19.0.155 dst=172.18.14.96 mac=F4:46:37:8B:66:DB protocol=udp sport=59909 dport=53
+Jun 27 00:02:29 server-176.53.2.142.as42926.net  1656277350.164960349 TR_IST_AP_8 flows allow src=172.19.0.155 dst=192.111.5.1 mac=F4:46:37:8B:66:DB protocol=tcp sport=59906 dport=443
+Jun 27 00:02:30 server-176.53.2.142.as42926.net  1656277350.263808018 TR_IST_AP_4 urls src=172.19.0.166:64785 dst=146.112.255.155:443 mac=F4:46:37:8B:5E:7F request: UNKNOWN https://api.opendns.com/...
