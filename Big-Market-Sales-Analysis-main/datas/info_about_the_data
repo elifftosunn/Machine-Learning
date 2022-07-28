@@ -1,3 +1,55 @@
+Datanin bir kisminde request atiliyor diger kisminde allow veriliyor, not allow olan datalari nasil gorebilirim?
+Data uzerinde allow olanlar geliyor ama not allow olanlari nasıl cekebilirim?
+Cunku buradan reddedilen ip adreslerinin hangi sebeplerle reddedildigini cekmem gerekiyor. Cunku agda kopukluk olmus olabilir ya da bir guvenlik sorunundan kaynakli olabilir veya baska bir sebeple
+
+
+
+Reddedilen ve bırakılan IP adreslerine bakın. Nereden geliyorlar? Öğrenmek için, IP adresini ping -a IP address kullanarak bir adla çözmeyi deneyin
+
+güvenlik duvarınızın günlük dosyalarını sürekli olarak izlemeniz gerekir.
+
+Güvenlik duvarı günlüklerinizi gözden geçirerek, yeni IP adreslerinin ağınızı araştırmaya çalışıp çalışmadığını ve bunları engellemek için yeni ve daha güçlü güvenlik duvarı kuralları mı yazmak, yoksa araştırmaları izlemek ve bir tür yönetim eylemi yapmak mı istediğinizi belirleyebilirsiniz.
+
+Örneğin, 31337 numaralı bağlantı noktasına çok sayıda araştırma yapılması, birisinin ağınıza BackOrifice yüklemeyi denemeye hazırlandığı anlamına gelebilir.
+Back Orifice (BO), kullanıcının basit bir konsol veya grafik kullanıcı arayüzü (GUI) üzerinden bir TCP / IP bağlantısı üzerinden Microsoft Windows işletim sistemini (OS) uzaktan çalıştıran bir bilgisayarı tam olarak kontrol etmesine izin veren bir uzaktan yönetim sistemidir. .
+
+
+Güvenlik duvarınızda veya koruduğu diğer kritik görev sunucularında başarısız oturum açmaları arayın. Aynı etki alanından çok sayıda başarısız giriş görürseniz, o etki alanından veya IP adresinden tüm bağlantıları kesmek için bir kural yazmak isteyebilirsiniz. Bunu yapmadan önce, IP adresinin sahte olmadığından emin olun.
+
+
+Şüpheli giden bağlantıları arayın. Örneğin, genel Web sunucunuzdan gelen giden bağlantılar, bir davetsiz misafirin Web sunucunuzdan başka birine yönelik bir saldırı başlattığının bir göstergesi olabilir.
+
+
+Kaynağa yönlendirilmiş paketleri arayın. Ağınızın dışından gelen, ağınızın içindeki bir kaynak adrese sahip paketler, birisinin dahili ağınıza erişmek için dahili adreslerinizden birini kandırmaya çalıştığını gösterebilir.
+
+
+
+https://www.youtube.com/watch?v=4DdueeIE8Rs  =>  pulling an instant log with python
+https://www.youtube.com/results?search_query=pulling+an+instant+log+with+python  =>  pulling an instant log with python
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------  Market Sales Datas --------------------------
 Item_Identifier : Unique product ID
 
 Item_Weight : Weight of product
