@@ -16,7 +16,6 @@ df = pd.concat([train_df, test_df]) # default: axis=0
 # yinelenen degerlere sahip olan satırları kaldırmak için kullandım.
 df = df[~df.index.duplicated()]
 
-
 # 1-DATA UNDERSTANDING
 
 print(dataUnderstand(df))
