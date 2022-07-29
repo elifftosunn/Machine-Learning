@@ -7,6 +7,7 @@ mongoResult = MongoResult(host="localhost",port=27017,databaseName="wifiData",co
 # results = mongo._mongoInformation.dataFindAll()
 # for value in results:
 #     print(value,"\n")
+   
     
 # KOD SATIRLARININ TAMAMINI SOLA KAYDIRMA => Ctrl + Alt Gr + [    
           
