@@ -215,20 +215,6 @@ def totalEntrySites():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # from urllib import response
 # from ip2geotools.databases.noncommercial import  DbIpCity
 # import socket
@@ -240,12 +226,6 @@ def totalEntrySites():
 # print('City: ', response.city)
 # print('Country: ', response.country)
 # print('BOLGE: ', response.region) 
-
-
-
-
-
-
 
 
 
