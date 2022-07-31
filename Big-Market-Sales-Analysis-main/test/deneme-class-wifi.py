@@ -7,9 +7,7 @@ mongoResult = MongoResult(host="localhost",port=27017,databaseName="wifiData",co
 # results = mongo._mongoInformation.dataFindAll()
 # for value in results:
 #     print(value,"\n")
-   
-    
-# KOD SATIRLARININ TAMAMINI SOLA KAYDIRMA => Ctrl + Alt Gr + [    
+
           
 # query = {"$and":[{"flow_or_url":"flows"},{"allow_or_src":"allow"}]}  # flow and allow query
 query = {"$and":[{"flow_or_url":"urls"},{"allow_or_src":{"$regex":"^src"}}]}  # urls and src query
