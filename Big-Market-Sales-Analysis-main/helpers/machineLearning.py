@@ -117,9 +117,6 @@ class MachineLearning:
         pre_score = precision_score(y_test, y_pred)
         fScore = f1_score(y_test, y_pred)
         return pre_score,fScore, test_summary, train_summary
-    # def evaluate_model(self): 
-    #     X_train, X_test, y_train, y_test = self.get_dataset(self,df, target, test_size, random_state)
-    
     
     def hyperparameter_optimization(model, param_grid, target, test_size, random_state, scoring, cv): # for the most suitable model 
         X_train, X_test, y_train, y_test = self.get_dataset(target, test_size, random_state)
