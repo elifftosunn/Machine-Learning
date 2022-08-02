@@ -15,8 +15,6 @@ df = pd.read_csv("datas/turcom-wifi.txt", error_bad_lines=False,
                  sep=" ", header=None, nrows=10000, names=columns)
 
 df = df.drop("Unnamed", axis=1)
-# df.to_csv("datas/processedDatas/processFile.csv")
-
 
 def datetime(df, time):
     df[time] = pd.to_datetime(df[time])
